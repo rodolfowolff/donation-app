@@ -1,10 +1,15 @@
-import React from 'react'
-import { Text } from 'react-native'
+import React from 'react';
+import { Text, View } from 'react-native';
+import { Button } from '../../components/common';
 
 const Onboarding = () => {
   return (
-    <Text>index</Text>
-  )
+    <View>
+      <Text>index</Text>
+      <Button title='teste' bgColor='primary' txtColor='white' />
+      <Button title='teste' bgColor='bg' txtColor='primary' outline />
+    </View>
+  );
 }
 
-export default Onboarding
+export default Onboarding;
