@@ -9,8 +9,8 @@ export type IFontsWeightsTypes = 'light' | 'regular' | 'bold';
 
 export const light = {
   colors: {
-    primary: '#0070f3',
-    black: '#2d2d2d',
+    primary: '#2d2d2d',
+    black: '#202020',
     white: '#F0F0F0',
     gray: '#696969',
     danger: '#FF0000',
