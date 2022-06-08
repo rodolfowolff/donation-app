@@ -3,6 +3,10 @@ import { Dimensions } from "react-native";
 export const WIDTH = Dimensions.get("window").width;
 export const HEIGHT = Dimensions.get("window").height;
 
+export type IColorsTypes = 'primary' | 'black' | 'white' | 'gray' | 'danger' | 'success' | 'warning' | 'info' | 'bg';
+export type IFontsSizesTypes = 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge';
+export type IFontsWeightsTypes = 'light' | 'regular' | 'bold';
+
 export const light = {
   colors: {
     primary: '#0070f3',
@@ -24,8 +28,8 @@ export const light = {
       xxlarge: 24,
     },
     weights: {
-      light: '200',
-      regular: '400',
+      light: '300',
+      regular: '500',
       bold: '700',
     },
   },

@@ -1,10 +1,11 @@
 import React from 'react';
 import * as S from './styles';
+import { IColorsTypes } from '../../../theme/light';
 
 interface IButtonProps {
   title: string;
-  bgColor?: 'primary' | 'black' | 'white' | 'gray' | 'danger' | 'success' | 'warning' | 'info' | 'bg'; 
-  txtColor?: 'primary' | 'black' | 'white' | 'gray' | 'danger' | 'success' | 'warning' | 'info' | 'bg';
+  bgColor?: IColorsTypes;
+  txtColor?: IColorsTypes;
   outline?: boolean;
 }
 

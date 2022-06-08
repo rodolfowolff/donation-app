@@ -1,13 +1,13 @@
 import styled from "styled-components/native";
+import { IColorsTypes } from "../../../theme";
 
-interface IButton {
-  bgColor?: 'primary' | 'black' | 'white' | 'gray' | 'danger' | 'success' | 'warning' | 'info' | 'bg'; 
-  txtColor?: 'primary' | 'black' | 'white' | 'gray' | 'danger' | 'success' | 'warning' | 'info' | 'bg';
+interface IButtonProps {
+  bgColor?: IColorsTypes;
+  txtColor?: IColorsTypes;
   outline?: boolean;
 }
 
-
-export const Container = styled.TouchableOpacity<IButton>`
+export const Container = styled.TouchableOpacity<IButtonProps>`
   width: 100%;
   height: 50px;
   justify-content: center;
@@ -17,8 +17,8 @@ export const Container = styled.TouchableOpacity<IButton>`
   border-radius: 5px;
 `;
 
-export const ButtonText = styled.Text<IButton>`
+export const ButtonText = styled.Text<IButtonProps>`
   color: ${({theme, txtColor}) => txtColor && theme.colors[txtColor]};
   font-size: ${props => props.theme.fonts.sizes.medium}px;
-  font-weight: ${props => props.theme.fonts.weights.bold};
+  font-weight: ${props => props.theme.fonts.weights.regular};
 `;
