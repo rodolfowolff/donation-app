@@ -11,3 +11,11 @@ export const Content = styled.View`
   padding-top: ${getStatusBarHeight(true) + 16}px;
   padding-bottom: ${getBottomSpace() + 10}px;
 `;
+
+export const BgImage = styled.Image`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`;
