@@ -1,7 +1,9 @@
 import styled from "styled-components/native";
-import { getStatusBarHeight, getBottomSpace } from "react-native-iphone-x-helper";
 
 export const BgImage = styled.Image`
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 80%;
+  height: 100%;
 `;

@@ -14,6 +14,6 @@ export const Button = styled.TouchableOpacity<IButtonProps>`
 
 export const ButtonText = styled.Text<IButtonProps>`
   color: ${({theme, txtColor}) => txtColor && theme.colors[txtColor]};
-  font-size: ${props => props.theme.fonts.sizes.medium}px;
-  font-weight: ${props => props.theme.fonts.weights.regular};
+  font-size: ${({ size, theme }) => size && theme.fonts.sizes[size] || 14}px;
+  font-weight: ${({ weight, theme }) => weight && theme.fonts.weights[weight] || theme.fonts.weights.regular};
 `;

@@ -11,15 +11,12 @@ const Onboarding = () => {
 
   return (
     <Container style={{ backgroundColor: colors.primary}}>
-
-
-      <Content>
-      <S.BgImage source={bgImage} resizeMode="contain" />
+      <S.BgImage source={bgImage} resizeMode="cover" />
+      <Content style={{flex: 1, justifyContent: 'flex-end'}}>
         {/* <Typography color='white' size='xxlarge' weight='regular'>Texto</Typography> */}
-        <Button title='Entrar como Doador' bgColor='white' txtColor='primary' margin={10} />
-        <Button title='Entrar como ONG' bgColor='white' txtColor='white' outline />
+        <Button title='Entrar como ONG' bgColor='white' txtColor='white' size="large"  weight='bold' outline />
+        <Button title='Entrar como Doador' bgColor='white' txtColor='primary' size="large"  weight='bold' margin={40}/>
       </Content>
-
     </Container>
   );
 }
