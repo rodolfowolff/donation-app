@@ -1,10 +1,8 @@
-import React from 'react'
-import AppNavigator from './AppNavigator'
+import React from "react";
+import AppNavigator from "./AppNavigator";
 
 const AppContainer = () => {
-  return (
-    <AppNavigator />
-  )
-}
+  return <AppNavigator />;
+};
 
-export default AppContainer
+export default AppContainer;

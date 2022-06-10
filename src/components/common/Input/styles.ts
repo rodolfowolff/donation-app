@@ -16,4 +16,3 @@ export const InputComponent = styled.TextInput`
   padding-right: 10px;
   color: ${({ theme }) => theme.colors.black};
 `;
-
