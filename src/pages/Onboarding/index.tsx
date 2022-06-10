@@ -29,7 +29,7 @@ const Onboarding = () => {
           size="large"
           weight='bold'
           outline 
-          onPress={() => navigate("LoginVerifyEmail")}
+          onPress={() => navigate("LoginVerifyEmail", { type: "ong" })}
         />
         <Button 
           title='Entrar como Doador'
@@ -38,7 +38,7 @@ const Onboarding = () => {
           size="large"
           weight='bold'
           margin={20}
-          onPress={() => navigate("LoginVerifyEmail")}
+          onPress={() => navigate("LoginVerifyEmail", { type: "donation" })}
         />
       </Content>
     </Container>

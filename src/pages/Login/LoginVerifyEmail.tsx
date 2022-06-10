@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar, View, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from 'styled-components/native';
 
 import { Button, Typography, Input  } from '../../components/common';
@@ -11,6 +11,7 @@ import Icon from '@expo/vector-icons/FontAwesome5';
 const LoginVerifyEmail = () => {
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
+  const { params }: any = useRoute();
 
   return (
     <Container style={{ backgroundColor: colors.primary}}>
@@ -28,10 +29,13 @@ const LoginVerifyEmail = () => {
           </Typography>
 
           <Typography color='white' size='medium' weight='regular' style={{ marginTop:10, marginBottom:15 }}>
-            Informe seu email que iremos verificar se você já possui um cadastro
+            { params.type === 'donation' ? 
+              'Informe seu email que iremos verificar se você já possui cadastro' : 
+              'Informe o cnpj da sua ONG que iremos verificar se já possui cadastro' 
+            }
           </Typography>
 
-          <Input rightIcon iconName="eye" placeholder='Informe seu email' iconPress={() => alert('t')} />
+          <Input placeholder='Informe seu email' />
         </View>
 
         <Button 
@@ -41,7 +45,7 @@ const LoginVerifyEmail = () => {
           size="large"  
           weight='bold' 
           margin={30}
-          onPress={() => navigate('LoginPassword')}
+          onPress={() => navigate('LoginPassword', { type: params.type })}
         />
       </Content>
     </Container>

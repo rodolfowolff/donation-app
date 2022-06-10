@@ -8,8 +8,8 @@ declare global {
   namespace ReactNavigation {
     interface RootParamList {
       Onboarding: undefined;
-      LoginVerifyEmail: undefined;
-      LoginPassword: undefined;
+      LoginVerifyEmail: { type: string };
+      LoginPassword: { type: string };
     }
   }
 }
