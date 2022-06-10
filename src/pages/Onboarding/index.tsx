@@ -1,6 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
 import { useTheme } from 'styled-components/native';
+import { useNavigation } from '@react-navigation/native';
 
 import { Button, Typography  } from '../../components/common';
 import { Container, Content, BgImage } from '../../styles/global.style';
@@ -8,6 +9,7 @@ import imageOnboard from '../../assets/images/onboarding-bg.png';
 
 const Onboarding = () => {
   const { colors } = useTheme();
+  const { navigate } = useNavigation();
 
   return (
     <Container style={{ backgroundColor: colors.primary}}>
@@ -20,8 +22,24 @@ const Onboarding = () => {
         <Typography color='white' size='medium' weight='regular' style={{marginTop:10, marginBottom:15}}>
           Selecione abaixo se você deseja entrar como doador ou como ONG
         </Typography>
-        <Button title='Entrar como ONG' bgColor='white' txtColor='white' size="large"  weight='bold' outline />
-        <Button title='Entrar como Doador' bgColor='white' txtColor='primary' size="large"  weight='bold' margin={20}/>
+        <Button 
+          title='Entrar como ONG'
+          bgColor='white'
+          txtColor='white'
+          size="large"
+          weight='bold'
+          outline 
+          onPress={() => navigate("LoginVerifyEmail")}
+        />
+        <Button 
+          title='Entrar como Doador'
+          bgColor='white'
+          txtColor='primary'
+          size="large"
+          weight='bold'
+          margin={20}
+          onPress={() => navigate("LoginVerifyEmail")}
+        />
       </Content>
     </Container>
   );
