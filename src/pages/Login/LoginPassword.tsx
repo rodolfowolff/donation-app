@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StatusBar, View, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from 'styled-components/native';
@@ -8,9 +8,10 @@ import { Container, Content, BgImage } from '../../styles/global.style';
 import imageOnboard from '../../assets/images/onboarding-bg.png';
 import Icon from '@expo/vector-icons/FontAwesome5';
 
-const LoginVerifyEmail = () => {
+const LoginPassword = () => {
   const { colors } = useTheme();
-  const { goBack, navigate } = useNavigation();
+  const { goBack } = useNavigation();
+  const [ showPassword, setShowPassword ] = useState(false);
 
   return (
     <Container style={{ backgroundColor: colors.primary}}>
@@ -28,24 +29,22 @@ const LoginVerifyEmail = () => {
           </Typography>
 
           <Typography color='white' size='medium' weight='regular' style={{ marginTop:10, marginBottom:15 }}>
-            Informe seu email que iremos verificar se você já possui um cadastro
+            Informe sua senha para continuar
           </Typography>
 
-          <Input rightIcon iconName="eye" placeholder='Informe seu email' iconPress={() => alert('t')} />
+          <Input 
+            rightIcon
+            iconName={showPassword ? 'eye-slash' : 'eye'}
+            placeholder='Informe sua senha'
+            secureTextEntry={showPassword}
+            iconPress={() => setShowPassword(!showPassword)} 
+          />
         </View>
 
-        <Button 
-          title='Continuar' 
-          bgColor='white' 
-          txtColor='primary' 
-          size="large"  
-          weight='bold' 
-          margin={30}
-          onPress={() => navigate('LoginPassword')}
-        />
+        <Button title='Continuar' bgColor='white' txtColor='primary' size="large"  weight='bold' margin={30}/>
       </Content>
     </Container>
   );
 }
 
-export default LoginVerifyEmail;
+export default LoginPassword;
