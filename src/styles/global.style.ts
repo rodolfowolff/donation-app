@@ -1,5 +1,8 @@
 import styled from "styled-components/native";
-import { getStatusBarHeight, getBottomSpace } from "react-native-iphone-x-helper";
+import {
+  getStatusBarHeight,
+  getBottomSpace,
+} from "react-native-iphone-x-helper";
 
 interface IContentProps {
   withHeader?: boolean;
@@ -15,7 +18,12 @@ export const Content = styled.View<IContentProps>`
   padding-right: 16px;
   padding-top: ${getStatusBarHeight(true) + 16}px;
   padding-bottom: ${getBottomSpace() + 10}px;
-  justify-content: ${({ withHeader }) => (withHeader ? "space-between" : "flex-end")};
+  justify-content: ${({ withHeader }) =>
+    withHeader ? "space-between" : "flex-end"};
+`;
+
+export const ScrollContent = styled.ScrollView`
+  flex: 1;
 `;
 
 export const BgImage = styled.Image`
@@ -25,3 +33,7 @@ export const BgImage = styled.Image`
   width: 100%;
   height: 100%;
 `;
+
+export const IconImage = styled.Image.attrs({
+  resizeMode: "contain",
+})``;

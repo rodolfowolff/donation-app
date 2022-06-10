@@ -1,7 +1,11 @@
-import React from 'react';
-import { TouchableOpacityProps } from 'react-native';
-import * as S from './styles';
-import { IColorsTypes, IFontsSizesTypes, IFontsWeightsTypes } from '../../../theme/light';
+import React from "react";
+import { TouchableOpacityProps } from "react-native";
+import { ButtonContent, ButtonText } from "./styles";
+import {
+  IColorsTypes,
+  IFontsSizesTypes,
+  IFontsWeightsTypes,
+} from "../../../theme/light";
 
 export interface IButtonProps {
   title?: string;
@@ -13,21 +17,28 @@ export interface IButtonProps {
   margin?: number;
 }
 
-const Button: React.FC<IButtonProps & TouchableOpacityProps> = ({ 
-  title, 
-  bgColor="primary", 
-  txtColor="black", 
-  size="medium", 
-  weight="regular", 
-  outline=false, 
+const Button: React.FC<IButtonProps & TouchableOpacityProps> = ({
+  title,
+  bgColor = "primary",
+  txtColor = "black",
+  size = "medium",
+  weight = "regular",
+  outline = false,
   margin,
   ...props
 }) => {
   return (
-    <S.Button bgColor={bgColor} outline={outline} margin={margin} {...props}>
-      <S.ButtonText txtColor={txtColor} size={size} weight={weight}>{title}</S.ButtonText>
-    </S.Button>
-  )
-}
+    <ButtonContent
+      bgColor={bgColor}
+      outline={outline}
+      margin={margin}
+      {...props}
+    >
+      <ButtonText txtColor={txtColor} size={size} weight={weight}>
+        {title}
+      </ButtonText>
+    </ButtonContent>
+  );
+};
 
 export { Button };
