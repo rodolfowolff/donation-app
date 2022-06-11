@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
 
 import { IconImage } from "../styles/global.style";
 import HomeIcon from "../assets/icons/home-icon.png";
@@ -28,7 +28,7 @@ const TabNavigator = () => {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.black,
+        tabBarInactiveTintColor: colors.gray,
         tabBarAllowFontScaling: false,
         tabBarIcon: ({ focused }) => {
           if (route.name === "Inicio") {

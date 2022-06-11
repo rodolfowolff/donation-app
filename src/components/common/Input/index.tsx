@@ -1,7 +1,7 @@
 import React from "react";
 import { TextInputProps, Pressable } from "react-native";
 import Icon from "@expo/vector-icons/FontAwesome5";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
 
 import { Container, InputComponent } from "./styles";
 import { IColorsTypes } from "../../../theme";

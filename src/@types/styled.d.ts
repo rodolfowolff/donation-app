@@ -1,35 +1,36 @@
-import 'styled-components'
+import "styled-components";
 
-declare module 'styled-components' {
+declare module "styled-components" {
   export interface DefaultTheme {
     colors: {
-      primary: string
-      black: string
-      white: string
-      gray: string
-      danger: string
-      success: string
-      warning: string
-      info: string
-      bg: string
-    }
+      primary: string;
+      black: string;
+      white: string;
+      gray: string;
+      danger: string;
+      success: string;
+      warning: string;
+      info: string;
+      bg: string;
+      stroke: string;
+    };
     fonts: {
       sizes: {
-        small: number
-        medium: number
-        large: number
-        xlarge: number
-        xxlarge: number
-      }
+        small: number;
+        medium: number;
+        large: number;
+        xlarge: number;
+        xxlarge: number;
+      };
       weights: {
-        light: string
-        regular: string
-        bold: string
-      }
-    }
+        light: string;
+        regular: string;
+        bold: string;
+      };
+    };
     screens: {
-      width: number
-      height: number
-    }
+      width: number;
+      height: number;
+    };
   }
 }

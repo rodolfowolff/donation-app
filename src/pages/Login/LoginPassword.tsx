@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StatusBar, View, Pressable } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
 
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";

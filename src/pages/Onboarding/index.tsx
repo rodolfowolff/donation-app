@@ -1,6 +1,6 @@
 import React from "react";
 import { StatusBar } from "react-native";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
 import { useNavigation } from "@react-navigation/native";
 
 import { Button, Typography } from "../../components/common";

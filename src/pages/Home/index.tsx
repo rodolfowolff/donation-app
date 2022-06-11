@@ -1,18 +1,19 @@
 import React from "react";
-import { FlatList, Text, StatusBar } from "react-native";
-import { useTheme } from "styled-components/native";
+import { FlatList, StatusBar } from "react-native";
+import { useTheme } from "styled-components";
 import { Header } from "../../components/common";
 
-import { ScrollContent } from "../../styles/global.style";
+import { Container } from "../../styles/global.style";
 import * as S from "./styles";
 import Icon from "@expo/vector-icons/FontAwesome5";
-
-const testeRender = () => <Text>teste</Text>;
+import CardOng from "../../components/common/CardOng";
 
 const Home = () => {
   const { colors } = useTheme();
+  const testeRender = () => <CardOng />;
+
   return (
-    <ScrollContent>
+    <Container>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
@@ -24,11 +25,13 @@ const Home = () => {
         />
         <FlatList
           data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10 }}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.toString()}
           renderItem={testeRender}
         />
       </S.ContentHome>
-    </ScrollContent>
+    </Container>
   );
 };
 
