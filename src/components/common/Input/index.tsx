@@ -17,6 +17,7 @@ interface InputProps {
   rightIconSize?: number;
   rightIconColor?: IColorsTypes | string;
   rightIconPress?: () => void;
+  containerStyle?: any;
 }
 
 const Input: React.FC<InputProps & TextInputProps> = ({
@@ -30,12 +31,13 @@ const Input: React.FC<InputProps & TextInputProps> = ({
   rightIconSize = 18,
   rightIconColor,
   rightIconPress,
+  containerStyle,
   ...props
 }) => {
   const { colors } = useTheme();
 
   return (
-    <InputContainer>
+    <InputContainer style={containerStyle}>
       {leftIcon && (
         <View style={{ paddingRight: 15 }}>
           <Icon name={leftIconName} size={lefticonSize} color={leftIconColor} />

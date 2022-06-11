@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, StatusBar } from "react-native";
+import { FlatList, StatusBar, View } from "react-native";
 import { useTheme } from "styled-components";
 import { Header, Typography, Input } from "../../components/common";
 
@@ -21,21 +21,25 @@ const Home = () => {
       />
       <S.ContentHome>
         <Header
+          leftComponent={
+            <View style={{ flex: 1 }}>
+              <Typography color="black" size="xlarge" weight="bold">
+                Olá, Fulano seja bem-vindo!
+              </Typography>
+              <Typography
+                color="gray"
+                size="medium"
+                weight="regular"
+                style={{ marginBottom: 10 }}
+              >
+                Aqui você pode encontar as ONGs que precisam de sua ajuda.
+              </Typography>
+            </View>
+          }
           rightComponent={<Icon name="bell" size={24} color={colors.black} />}
         />
-        <S.ContentHeaderHome>
-          <Typography color="black" size="xlarge" weight="bold">
-            Olá, Fulano seja bem-vindo!
-          </Typography>
-          <Typography
-            color="gray"
-            size="medium"
-            weight="regular"
-            style={{ marginBottom: 10 }}
-          >
-            Aqui você pode encontar as ONGs que precisam de sua ajuda.
-          </Typography>
 
+        <S.ContentHeaderHome>
           <Input
             leftIcon
             leftIconName="search"
@@ -43,6 +47,7 @@ const Home = () => {
             leftIconColor={colors.gray}
             placeholder="Buscar ONG"
             leftIconPress={() => {}}
+            containerStyle={{ borderWidth: 1, borderColor: colors.stroke }}
           />
 
           <Typography
