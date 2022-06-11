@@ -22,7 +22,7 @@ const CardOng = () => {
         color="black"
         size="medium"
         weight="bold"
-        style={{ marginBottom: 1, marginTop: 2 }}
+        style={{ marginTop: 1 }}
       >
         Nome da ONG
       </Typography>
@@ -30,10 +30,10 @@ const CardOng = () => {
         color="gray"
         size="small"
         weight="regular"
-        style={{ marginBottom: 4 }}
+        style={{ marginBottom: 3 }}
       >
         Descrição da ONG, descrição da ONG, descrição da ONG, descrição da ONG
-        descrição da ONG descrição da ONG descrição da ONG descrição da ONG
+        descrição da ONG descrição da ONG...
       </Typography>
       <Button
         title="Ver mais"

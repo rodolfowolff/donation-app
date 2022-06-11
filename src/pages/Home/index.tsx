@@ -1,7 +1,7 @@
 import React from "react";
 import { FlatList, StatusBar } from "react-native";
 import { useTheme } from "styled-components";
-import { Header } from "../../components/common";
+import { Header, Typography, Input } from "../../components/common";
 
 import { Container } from "../../styles/global.style";
 import * as S from "./styles";
@@ -23,9 +23,40 @@ const Home = () => {
         <Header
           rightComponent={<Icon name="bell" size={24} color={colors.black} />}
         />
+        <S.ContentHeaderHome>
+          <Typography color="black" size="xlarge" weight="bold">
+            Olá, Fulano seja bem-vindo!
+          </Typography>
+          <Typography
+            color="gray"
+            size="medium"
+            weight="regular"
+            style={{ marginBottom: 10 }}
+          >
+            Aqui você pode encontar as ONGs que precisam de sua ajuda.
+          </Typography>
+
+          <Input
+            leftIcon
+            leftIconName="search"
+            lefticonSize={20}
+            leftIconColor={colors.gray}
+            placeholder="Buscar ONG"
+            leftIconPress={() => {}}
+          />
+
+          <Typography
+            color="primary"
+            size="medium"
+            weight="bold"
+            style={{ marginTop: 10 }}
+          >
+            Ongs próximas a você:
+          </Typography>
+        </S.ContentHeaderHome>
         <FlatList
           data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.toString()}
           renderItem={testeRender}

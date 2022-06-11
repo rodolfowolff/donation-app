@@ -7,7 +7,7 @@ export const ContainerCard = styled.View`
   background-color: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.stroke};
   border-radius: 16px;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   padding: 7px;
   justify-content: center;
 `;
@@ -19,8 +19,8 @@ export const ImageCard = styled.Image`
 `;
 
 export const ButtonFavorite = styled.TouchableOpacity`
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
   position: absolute;
   border-radius: 15px;
   background-color: ${({ theme }) => theme.colors.white};

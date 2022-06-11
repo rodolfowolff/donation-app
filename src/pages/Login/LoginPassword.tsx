@@ -45,10 +45,10 @@ const LoginPassword = () => {
 
           <Input
             rightIcon
-            iconName={showPassword ? "eye-slash" : "eye"}
+            rightIconName={showPassword ? "eye-slash" : "eye"}
             placeholder="Informe sua senha"
             secureTextEntry={showPassword}
-            iconPress={() => setShowPassword(!showPassword)}
+            rightIconPress={() => setShowPassword(!showPassword)}
           />
         </View>
 
