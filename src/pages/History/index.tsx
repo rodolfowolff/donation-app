@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, StatusBar } from "react-native";
+import { View, StatusBar } from "react-native";
+import Header from "../../components/common/Header";
 
 const History = () => {
   return (
@@ -9,7 +10,7 @@ const History = () => {
         backgroundColor="transparent"
         translucent
       />
-      <Text>History</Text>
+      <Header back title="History" />
     </View>
   );
 };
