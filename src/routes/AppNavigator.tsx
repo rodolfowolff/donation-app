@@ -2,7 +2,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Onboarding from "../pages/Onboarding";
-import LoginVerifyEmail from "../pages/Login/LoginVerifyEmail";
+import LoginDocument from "../pages/Login/LoginDocument";
 import LoginPassword from "../pages/Login/LoginPassword";
 import TabNavigator from "./TabNavigator";
 
@@ -10,8 +10,8 @@ declare global {
   namespace ReactNavigation {
     interface RootParamList {
       Onboarding: undefined;
-      LoginVerifyEmail: { type: string };
-      LoginPassword: { type: string };
+      LoginDocument: { type: string };
+      LoginPassword: { type: string; document: string };
     }
   }
 }
@@ -26,7 +26,7 @@ const AppNavigator = () => {
       initialRouteName="Onboarding"
     >
       <Stack.Screen name="Onboarding" component={Onboarding} />
-      <Stack.Screen name="LoginVerifyEmail" component={LoginVerifyEmail} />
+      <Stack.Screen name="LoginDocument" component={LoginDocument} />
       <Stack.Screen name="LoginPassword" component={LoginPassword} />
       <Stack.Screen name="Index" component={TabNavigator} />
     </Stack.Navigator>
