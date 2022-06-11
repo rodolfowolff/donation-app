@@ -3,15 +3,36 @@ import { StatusBar, View, Pressable } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTheme } from "styled-components";
 
+import { useGeneralContext } from "../../context/general";
+
+import Icon from "@expo/vector-icons/FontAwesome5";
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
 import imageOnboard from "../../assets/images/onboarding-bg.png";
-import Icon from "@expo/vector-icons/FontAwesome5";
 
 const LoginVerifyEmail = () => {
+  const { api } = useGeneralContext();
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
   const { params }: any = useRoute();
+
+  const teste = async () => {
+    console.log("teste");
+    try {
+      const { data } = await api({
+        entity: "authentication",
+        action: "userLogin",
+        payload: {
+          document: "021.630.330-32",
+          password: "12345678",
+        },
+      });
+
+      console.log("data: ", data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Container style={{ backgroundColor: colors.primary }}>
@@ -56,7 +77,7 @@ const LoginVerifyEmail = () => {
           size="large"
           weight="bold"
           margin={30}
-          onPress={() => navigate("LoginPassword", { type: params.type })}
+          onPress={() => teste()}
         />
       </Content>
     </Container>

@@ -23,12 +23,12 @@ const AppNavigator = () => {
     //@ts-ignore
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Index"
+      initialRouteName="Onboarding"
     >
-      <Stack.Screen name="Index" component={TabNavigator} />
       <Stack.Screen name="Onboarding" component={Onboarding} />
       <Stack.Screen name="LoginVerifyEmail" component={LoginVerifyEmail} />
       <Stack.Screen name="LoginPassword" component={LoginPassword} />
+      <Stack.Screen name="Index" component={TabNavigator} />
     </Stack.Navigator>
   );
 };
