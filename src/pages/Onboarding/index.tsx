@@ -1,6 +1,6 @@
 import React from "react";
 import { StatusBar } from "react-native";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
 import { useNavigation } from "@react-navigation/native";
 
 import { Button, Typography } from "../../components/common";
@@ -38,7 +38,7 @@ const Onboarding = () => {
           size="large"
           weight="bold"
           outline
-          onPress={() => navigate("LoginVerifyEmail", { type: "ong" })}
+          onPress={() => navigate("LoginDocument", { type: "ong" })}
         />
         <Button
           title="Entrar como Doador"
@@ -47,7 +47,7 @@ const Onboarding = () => {
           size="large"
           weight="bold"
           margin={20}
-          onPress={() => navigate("LoginVerifyEmail", { type: "donation" })}
+          onPress={() => navigate("LoginDocument", { type: "donation" })}
         />
       </Content>
     </Container>

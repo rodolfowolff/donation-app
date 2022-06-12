@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { StatusBar, View, Pressable } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
+
+import { useGeneralContext } from "../../context/general";
 
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
@@ -9,10 +11,61 @@ import imageOnboard from "../../assets/images/onboarding-bg.png";
 import Icon from "@expo/vector-icons/FontAwesome5";
 
 const LoginPassword = () => {
+  const { api } = useGeneralContext();
   const { colors } = useTheme();
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
   const { params }: any = useRoute();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError("");
+    if (password.length < 8) {
+      setError("Senha deve ter no mínimo 8 caracteres");
+      setLoading(false);
+      return alert("Senha deve ter no mínimo 8 caracteres");
+    }
+    try {
+      const { data } = await api({
+        entity: "authentication",
+        action: params.type === "donation" ? "loginUser" : "loginOng",
+        payload: {
+          document: `${params.document}`,
+          password: `${password}`,
+        },
+      });
+
+      if (data.error) {
+        console.log("data.error: ", data.error);
+        setError(data.error.response.data.message);
+        setLoading(false);
+        return alert(data.error.response.data.message);
+      }
+
+      if (data) {
+        navigate("Index", {
+          type: params.type,
+          userName: data.user.firstName,
+          token: data.token,
+        });
+      }
+    } catch (error: any) {
+      console.log("error na page password: ", error);
+      setError(
+        error.response?.data?.message ||
+          "Erro no servidor, tente novamente mais tarde."
+      );
+      setLoading(false);
+      return alert(
+        error.response?.data?.message ||
+          "Erro no servidor, tente novamente mais tarde."
+      );
+    }
+  };
 
   return (
     <Container style={{ backgroundColor: colors.primary }}>
@@ -45,10 +98,14 @@ const LoginPassword = () => {
 
           <Input
             rightIcon
-            iconName={showPassword ? "eye-slash" : "eye"}
+            rightIconName={!showPassword ? "eye-slash" : "eye"}
             placeholder="Informe sua senha"
-            secureTextEntry={showPassword}
-            iconPress={() => setShowPassword(!showPassword)}
+            secureTextEntry={!showPassword}
+            rightIconPress={() => setShowPassword(!showPassword)}
+            value={password}
+            onChangeText={(pass) => setPassword(pass)}
+            maxLength={20}
+            autoCorrect={false}
           />
         </View>
 
@@ -59,6 +116,9 @@ const LoginPassword = () => {
           size="large"
           weight="bold"
           margin={30}
+          onPress={() => {
+            handleLogin();
+          }}
         />
       </Content>
     </Container>

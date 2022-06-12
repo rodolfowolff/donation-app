@@ -6,10 +6,12 @@ import { Typography } from "../Text";
 const Header = ({
   back,
   title,
+  leftComponent,
   rightComponent,
 }: {
   back?: boolean;
   title?: string;
+  leftComponent?: any;
   rightComponent?: any;
 }) => {
   return (
@@ -19,6 +21,7 @@ const Header = ({
           <Icon name="chevron-left" size={22} color="#000" />
         </S.Left>
       )}
+      <S.Left>{leftComponent}</S.Left>
 
       <S.Center>
         <Typography color="black" size="medium" weight="regular">

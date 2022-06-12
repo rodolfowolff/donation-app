@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StatusBar } from "react-native";
-import Header from "../../components/common/Header";
+import { Header } from "../../components/common";
 
 const History = () => {
   return (

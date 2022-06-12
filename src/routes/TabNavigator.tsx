@@ -1,16 +1,9 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useTheme } from "styled-components/native";
+import { useTheme } from "styled-components";
 
-import { IconImage } from "../styles/global.style";
-import HomeIcon from "../assets/icons/home-icon.png";
-import HomeIconActive from "../assets/icons/home-icon-active.png";
-import FavoritesIcon from "../assets/icons/favorites-icon.png";
-import FavoritesActive from "../assets/icons/favorites-icon-active.png";
-import HistoryIcon from "../assets/icons/history-icon.png";
-import HistoryActive from "../assets/icons/history-icon-active.png";
-import ProfileIcon from "../assets/icons/profile-icon.png";
-import ProfileActive from "../assets/icons/profile-icon-active.png";
+// Icons
+import { AntDesign } from "@expo/vector-icons";
 
 // Pages
 import Home from "../pages/Home";
@@ -28,19 +21,45 @@ const TabNavigator = () => {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.black,
+        tabBarInactiveTintColor: colors.gray,
         tabBarAllowFontScaling: false,
         tabBarIcon: ({ focused }) => {
           if (route.name === "Inicio") {
-            return <IconImage source={focused ? HomeIconActive : HomeIcon} />;
+            return (
+              //@ts-ignore
+              <AntDesign
+                name="home"
+                size={focused ? 30 : 25}
+                color={focused ? colors.primary : colors.gray}
+              />
+            );
           } else if (route.name === "Favoritos") {
             return (
-              <IconImage source={focused ? FavoritesActive : FavoritesIcon} />
+              //@ts-ignore
+              <AntDesign
+                name="hearto"
+                size={focused ? 30 : 25}
+                color={focused ? colors.primary : colors.gray}
+              />
             );
           } else if (route.name === "Historico") {
-            return <IconImage source={focused ? HistoryActive : HistoryIcon} />;
+            return (
+              //@ts-ignore
+              <AntDesign
+                name="filetext1"
+                size={focused ? 30 : 25}
+                color={focused ? colors.primary : colors.gray}
+              />
+            );
           } else {
-            return <IconImage source={focused ? ProfileActive : ProfileIcon} />;
+            return (
+              //@ts-ignore
+              <AntDesign
+                name="user"
+                size={focused ? 30 : 25}
+                color={focused ? colors.primary : colors.gray}
+              />
+            );
           }
         },
       })}
