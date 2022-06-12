@@ -12,6 +12,11 @@ declare global {
       Onboarding: undefined;
       LoginDocument: { type: string };
       LoginPassword: { type: string; document: string };
+      Index: {
+        type: string;
+        userName: string;
+        token: string;
+      };
     }
   }
 }

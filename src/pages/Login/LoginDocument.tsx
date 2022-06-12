@@ -30,10 +30,10 @@ const LoginDocument = () => {
   const handleCheckDocument = async () => {
     setLoading(true);
     setError("");
-    if (document.length < 11) {
-      setError("CPF/CNPJ inválido");
+    if (document.length < 14) {
+      setError("CPF/CNPJ deve ter no mínimo 11 caracteres");
       setLoading(false);
-      return;
+      return alert("CPF/CNPJ deve ter no mínimo 11 caracteres");
     }
     const documentUnMasked = cpfCnpjUnmask(document);
 
@@ -66,10 +66,16 @@ const LoginDocument = () => {
         document: documentUnMasked,
       });
     } catch (error: any) {
-      console.log(error.response.data.message);
-      setError(error.response.data.message);
+      console.log("error na page document: ", error);
+      setError(
+        error.response?.data?.message ||
+          "Erro no servidor, tente novamente mais tarde."
+      );
       setLoading(false);
-      return alert(error.response.data.message);
+      return alert(
+        error.response?.data?.message ||
+          "Erro no servidor, tente novamente mais tarde."
+      );
     }
   };
 

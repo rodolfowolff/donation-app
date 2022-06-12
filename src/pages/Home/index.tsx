@@ -1,5 +1,6 @@
 import React from "react";
 import { FlatList, StatusBar, View } from "react-native";
+import { useRoute } from "@react-navigation/native";
 import { useTheme } from "styled-components";
 import { Header, Typography, Input } from "../../components/common";
 
@@ -11,6 +12,9 @@ import CardOng from "../../components/common/CardOng";
 const Home = () => {
   const { colors } = useTheme();
   const testeRender = () => <CardOng />;
+  const { params }: any = useRoute();
+
+  console.log("params: ", params);
 
   return (
     <Container>

@@ -15,9 +15,8 @@ const LoginPassword = () => {
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
   const { params }: any = useRoute();
-  const [showPassword, setShowPassword] = useState(false);
 
-  console.log("params: ", params.document);
+  const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,9 +25,9 @@ const LoginPassword = () => {
     setLoading(true);
     setError("");
     if (password.length < 8) {
-      setError("Senha inválida");
+      setError("Senha deve ter no mínimo 8 caracteres");
       setLoading(false);
-      return;
+      return alert("Senha deve ter no mínimo 8 caracteres");
     }
     try {
       const { data } = await api({
@@ -41,20 +40,30 @@ const LoginPassword = () => {
       });
 
       if (data.error) {
+        console.log("data.error: ", data.error);
         setError(data.error.response.data.message);
         setLoading(false);
         return alert(data.error.response.data.message);
       }
 
-      navigate("Index", {
-        type: params.type,
-        userName: data.user.firstName,
-        userEmail: data.user.userPersonalData,
-        token: data.token,
-      });
+      if (data) {
+        navigate("Index", {
+          type: params.type,
+          userName: data.user.firstName,
+          token: data.token,
+        });
+      }
     } catch (error: any) {
-      console.log("error: ", error.response.data.message);
-      return alert(error.response.data.message);
+      console.log("error na page password: ", error);
+      setError(
+        error.response?.data?.message ||
+          "Erro no servidor, tente novamente mais tarde."
+      );
+      setLoading(false);
+      return alert(
+        error.response?.data?.message ||
+          "Erro no servidor, tente novamente mais tarde."
+      );
     }
   };
 
@@ -89,9 +98,9 @@ const LoginPassword = () => {
 
           <Input
             rightIcon
-            rightIconName={showPassword ? "eye-slash" : "eye"}
+            rightIconName={!showPassword ? "eye-slash" : "eye"}
             placeholder="Informe sua senha"
-            secureTextEntry={showPassword}
+            secureTextEntry={!showPassword}
             rightIconPress={() => setShowPassword(!showPassword)}
             value={password}
             onChangeText={(pass) => setPassword(pass)}
