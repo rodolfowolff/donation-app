@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { StatusBar } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StatusBar, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { cepMask } from "js-essentials-functions";
+import { cepMask, cepUnmask } from "js-essentials-functions";
 
 import { useRegister } from "../../context/register";
 
@@ -9,63 +9,89 @@ import { useTheme } from "styled-components";
 import { Header, Typography, Input, Button } from "../../components/common";
 import { Container, ScrollContent } from "../../styles/global.style";
 import * as S from "./styles";
+import useFetch from "../../hooks/useFetch";
 
 const RegisterAddress = () => {
   const { params }: any = useRoute();
   const { addressData, setAddressData } = useRegister();
   const { navigate } = useNavigation();
   const { colors } = useTheme();
-
-  const [error, setError] = useState("");
+  const { data, error } = useFetch(
+    addressData.zipCode && addressData.zipCode.length === 9
+      ? `/zipcode/${cepUnmask(addressData.zipCode)}`
+      : null
+  );
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (data) {
+      setAddressData({
+        ...addressData,
+        street: data.street,
+        neighborhood: data.neighborhood,
+        city: data.city,
+        state: data.state,
+      });
+    } else if (error) {
+      setAddressData({
+        ...addressData,
+        zipCode: "",
+        street: "",
+        neighborhood: "",
+        city: "",
+        state: "",
+      });
+      Alert.alert("Erro", "Ocorreu um erro ao buscar o CEP, tente novamente");
+    } else {
+      setAddressData({
+        ...addressData,
+        zipCode: "",
+        street: "",
+        neighborhood: "",
+        city: "",
+        state: "",
+      });
+    }
+  }, [data]);
+
+  const verifyFields = () => {
+    if (
+      addressData.zipCode.length === 9 &&
+      addressData.street.length > 3 &&
+      addressData.number.length > 0 &&
+      addressData.neighborhood.length > 3 &&
+      addressData.city.length > 3 &&
+      addressData.state.length === 2
+    ) {
+      return true;
+    }
+    Alert.alert("Preencha todos os campos corretamente");
+    return false;
+  };
 
   const handleRegisterAddress = () => {
     setLoading(true);
-    setError("");
+    const verify = verifyFields();
+    if (!verify) {
+      return;
+    }
 
     navigate("RegisterPassword", {
       type: params.type,
     });
     // if (firstName.length < 3 || firstName.length > 20) {
-    //   setError("Nome deve ter no mínimo 3 caracteres");
     //   setLoading(false);
     //   return alert("Nome deve ter no mínimo 3 caracteres");
     // }
-    // if (
-    //   email.length < 3 ||
-    //   email.length > 50 ||
-    //   !email.includes("@") ||
-    //   !email.includes(".")
-    // ) {
-    //   setError(
-    //     "Email deve ter no mínimo 3 caracteres e no máximo 50 caracteres"
-    //   );
-    //   setLoading(false);
-    //   return alert(
-    //     "Email deve ter no mínimo 3 caracteres e no máximo 50 caracteres"
-    //   );
-    // }
-    // if (telephone.length < 10 || telephone.length > 11) {
-    //   setError("Telefone deve ter no mínimo 10 caracteres");
-    //   setLoading(false);
-    //   return alert("Telefone deve ter no mínimo 10 caracteres");
-    // }
     // if (params.type === "donation") {
     //   if (lastName.length < 3 || lastName.length > 20) {
-    //     setError("Sobrenome deve ter no mínimo 3 caracteres e no máximo 20");
     //     setLoading(false);
     //     return alert(
     //       "Sobrenome deve ter no mínimo 3 caracteres e no máximo 20"
     //     );
     //   }
-    //   if (birthDate.length < 10) {
-    //     setError("Data de nascimento deve ter no mínimo 10 caracteres");
-    //     setLoading(false);
-    //     return alert("Data de nascimento deve ter no mínimo 10 caracteres");
-    //   }
     // } else {
     //   if (description.length < 10) {
-    //     setError("Descrição deve ter no mínimo 10 caracteres");
     //     setLoading(false);
     //     return alert("Descrição deve ter no mínimo 10 caracteres");
     //   }
