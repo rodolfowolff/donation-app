@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StatusBar } from "react-native";
+import { StatusBar, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { telephoneMask, dateMask } from "js-essentials-functions";
 
@@ -24,63 +24,118 @@ const RegisterPersonalData = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const verifyFields = () => {
+    if (params.type === "donation") {
+      if (
+        userPersonalData.firstName.length < 3 ||
+        userPersonalData.firstName.length > 20
+      ) {
+        Alert.alert("Nome inválido", "O nome deve ter entre 3 e 20 caracteres");
+        return false;
+      }
+
+      if (
+        userPersonalData.lastName.length < 3 ||
+        userPersonalData.lastName.length > 20
+      ) {
+        Alert.alert(
+          "Sobrenome inválido",
+          "O sobrenome deve ter entre 3 e 20 caracteres"
+        );
+        return false;
+      }
+
+      if (
+        userPersonalData.email.length < 5 ||
+        userPersonalData.email.length > 50 ||
+        !userPersonalData.email.includes("@") ||
+        !userPersonalData.email.includes(".")
+      ) {
+        Alert.alert(
+          "Email inválido",
+          "O email deve ter entre 5 e 50 caracteres e conter @ e ."
+        );
+        return false;
+      }
+
+      console.log(userPersonalData.telephone.length);
+      if (
+        userPersonalData.telephone.length < 14 ||
+        userPersonalData.telephone.length > 15
+      ) {
+        Alert.alert(
+          "Telefone inválido",
+          "O Telefone deve ter entre 10 ou 11 caracteres, incluindo o DDD"
+        );
+        return false;
+      }
+
+      if (userPersonalData.birthDate.length !== 10) {
+        Alert.alert(
+          "Data de nascimento inválida",
+          "A data de nascimento deve ter 10 caracteres, no formato dia/mes/ano"
+        );
+        return false;
+      }
+    } else if (params.type === "ong") {
+      if (ongPersonalData.name.length < 3 || ongPersonalData.name.length > 20) {
+        Alert.alert("Nome inválido", "O nome deve ter entre 3 e 20 caracteres");
+        return false;
+      }
+
+      if (
+        ongPersonalData.email.length < 5 ||
+        ongPersonalData.email.length > 50 ||
+        !ongPersonalData.email.includes("@") ||
+        !ongPersonalData.email.includes(".")
+      ) {
+        Alert.alert(
+          "Email inválido",
+          "O email deve ter entre 5 e 50 caracteres e conter @ e ."
+        );
+        return false;
+      }
+
+      if (
+        ongPersonalData.telephone.length < 14 ||
+        ongPersonalData.telephone.length > 15
+      ) {
+        Alert.alert(
+          "Telefone inválido",
+          "O Telefone deve ter entre 10 ou 11 caracteres, incluindo o DDD"
+        );
+        return false;
+      }
+
+      if (ongPersonalData.description.length < 10) {
+        Alert.alert(
+          "Descrição inválida",
+          "A descrição deve ter no mínimo 10 caracteres"
+        );
+        return false;
+      }
+    } else {
+      Alert.alert("Tipo inválido", "Tipo deve ser doador ou ong");
+      return false;
+    }
+    return true;
+  };
+
   const handleRegisterPersonalData = () => {
     setLoading(true);
     setError("");
+
+    const verify = verifyFields();
+    if (!verify) {
+      setLoading(false);
+      return;
+    }
+
     console.log("userPersonalData: ", userPersonalData);
     console.log("ongPersonalData: ", ongPersonalData);
     navigate("RegisterAddress", {
       type: params.type,
     });
-
-    // if (firstName.length < 3 || firstName.length > 20) {
-    //   setError("Nome deve ter no mínimo 3 caracteres");
-    //   setLoading(false);
-    //   return alert("Nome deve ter no mínimo 3 caracteres");
-    // }
-    // if (
-    //   email.length < 3 ||
-    //   email.length > 50 ||
-    //   !email.includes("@") ||
-    //   !email.includes(".")
-    // ) {
-    //   setError(
-    //     "Email deve ter no mínimo 3 caracteres e no máximo 50 caracteres"
-    //   );
-    //   setLoading(false);
-    //   return alert(
-    //     "Email deve ter no mínimo 3 caracteres e no máximo 50 caracteres"
-    //   );
-    // }
-    // if (telephone.length < 10 || telephone.length > 11) {
-    //   setError("Telefone deve ter no mínimo 10 caracteres");
-    //   setLoading(false);
-    //   return alert("Telefone deve ter no mínimo 10 caracteres");
-    // }
-    // if (params.type === "donation") {
-    //   if (lastName.length < 3 || lastName.length > 20) {
-    //     setError("Sobrenome deve ter no mínimo 3 caracteres e no máximo 20");
-    //     setLoading(false);
-    //     return alert(
-    //       "Sobrenome deve ter no mínimo 3 caracteres e no máximo 20"
-    //     );
-    //   }
-    //   if (birthDate.length < 10) {
-    //     setError("Data de nascimento deve ter no mínimo 10 caracteres");
-    //     setLoading(false);
-    //     return alert("Data de nascimento deve ter no mínimo 10 caracteres");
-    //   }
-    // } else {
-    //   if (description.length < 10) {
-    //     setError("Descrição deve ter no mínimo 10 caracteres");
-    //     setLoading(false);
-    //     return alert("Descrição deve ter no mínimo 10 caracteres");
-    //   }
-    // }
-    // setLoading(false);
-    // navigate("RegisterAddress", {
-    //   type: params.type,
-    // });
   };
 
   return (
@@ -178,7 +233,7 @@ const RegisterPersonalData = () => {
         />
 
         <Input
-          placeholder="Celular com DDD Ex: 11 99999-9999"
+          placeholder="Celular com DDD (Ex: (11) 99999-9999)"
           containerStyle={{
             borderWidth: 1,
             borderColor: colors.stroke,
@@ -201,7 +256,7 @@ const RegisterPersonalData = () => {
 
         {params.type === "donation" && (
           <Input
-            placeholder="Data de nascimento (Dia/Mes/Ano)"
+            placeholder="Data de nascimento (Ex: 01/01/1900)"
             containerStyle={{
               borderWidth: 1,
               borderColor: colors.stroke,

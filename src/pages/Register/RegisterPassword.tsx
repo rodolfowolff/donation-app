@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StatusBar } from "react-native";
+import { StatusBar, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { cepMask } from "js-essentials-functions";
 
@@ -19,6 +19,7 @@ const RegisterPassword = () => {
     setUserPersonalData,
     ongPersonalData,
     setOngPersonalData,
+    addressData,
   } = useRegister();
   const { navigate } = useNavigation();
   const { colors } = useTheme();
@@ -34,70 +35,141 @@ const RegisterPassword = () => {
     setLoading(true);
     setError("");
 
-    console.log("userPersonalData: ", userPersonalData);
-    console.log("ongPersonalData: ", ongPersonalData);
-
-    if (userPersonalData.password !== confirmPassword) {
-      setError("Senhas não conferem");
-      setLoading(false);
-      return alert("Senhas não conferem");
-    }
-
     if (params.type === "donation") {
       if (
-        userPersonalData.password.length < 6 ||
-        userPersonalData.password.length > 20
+        userPersonalData.password.length < 8 ||
+        userPersonalData.password.length > 20 ||
+        confirmPassword.length < 8 ||
+        confirmPassword.length > 16
       ) {
-        setError("Senha deve ter no mínimo 6 caracteres");
         setLoading(false);
-        return alert("Senha deve ter no mínimo 6 caracteres");
+        Alert.alert(
+          "Senha inválida",
+          "A senha e confirmação deve ter entre 8 e 20 caracteres"
+        );
+        return;
       }
-    } else {
+
+      if (userPersonalData.password !== confirmPassword) {
+        setError("Senhas não conferem");
+        setLoading(false);
+        Alert.alert(
+          "Senha e confirmação diferentes",
+          "A senha e confirmação deve ser iguais!"
+        );
+        return;
+      }
+    } else if (params.type === "ong") {
       if (
-        ongPersonalData.password.length < 6 ||
+        ongPersonalData.password.length < 8 ||
         ongPersonalData.password.length > 20
       ) {
-        setError("Senha deve ter no mínimo 6 caracteres");
         setLoading(false);
-        return alert("Senha deve ter no mínimo 6 caracteres");
+        Alert.alert(
+          "Senha inválida",
+          "A senha e confirmação deve ter entre 8 e 20 caracteres"
+        );
+        return;
       }
+
+      if (ongPersonalData.password !== confirmPassword) {
+        setError("Senhas não conferem");
+        setLoading(false);
+        Alert.alert(
+          "Senha e confirmação diferentes",
+          "A senha e confirmação deve ser iguais!"
+        );
+        return;
+      }
+    } else {
+      setLoading(false);
+      Alert.alert("Erro", "Tipo de usuário inválido");
+      return;
     }
 
-    // try {
-    //   const { data } = await api({
-    //     entity: "authentication",
-    //     action: params.type === "donation" ? "registerUser" : "registerOng",
-    //     payload: {
+    const payload =
+      params.type === "donation"
+        ? {
+            ...userPersonalData,
+            address: {
+              ...addressData,
+            },
+          }
+        : {
+            ...ongPersonalData,
+            address: {
+              ...addressData,
+            },
+          };
 
-    //     },
-    //   } as any);
+    console.log("payload: ", payload);
+    try {
+      const { data } = await api({
+        entity: "register",
+        action: params.type === "donation" ? "registerUser" : "registerOng",
+        payload,
+      } as any);
 
-    //   if (data.error) {
-    //     console.log("data.error: ", data.error);
-    //     setError(data.error.response.data.message);
-    //     setLoading(false);
-    //     return alert(data.error.response.data.message);
-    //   }
+      console.log("data: ", data);
 
-    //   if (data) {
-    //     navigate("Index", {
-    //       type: params.type,
-    //       userName: data.user.firstName,
-    //       token: data.token,
-    //     });
-    //   }
-    // } catch (error: any) {
-    //   console.log("error na page password: ", error);
-    //   setError(
-    //     error.response?.data?.message ||
-    //       "Erro no servidor, tente novamente mais tarde."
-    //   );
-    //   setLoading(false);
-    //   return alert(
-    //     error.response?.data?.message ||
-    //       "Erro no servidor, tente novamente mais tarde."
-    //   );
-    // }
+      if (data.error) {
+        console.log("data.error: ", data.error);
+        setError(data.error.response.data.message);
+        setLoading(false);
+        return Alert.alert(data.error.response.data.message);
+      }
+
+      if (
+        (data && data.message === "Ong created successfully") ||
+        data.message === "User created successfully"
+      ) {
+        setLoading(false);
+        Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
+
+        const login = await api({
+          entity: "authentication",
+          action: params.type === "donation" ? "loginUser" : "loginOng",
+          payload: {
+            document:
+              params.type === "donation"
+                ? userPersonalData.document
+                : ongPersonalData.document,
+            password:
+              params.type === "donation"
+                ? `${userPersonalData.password}`
+                : `${ongPersonalData.password}`,
+          },
+        } as any);
+
+        if (login.data.error) {
+          console.log("login.data.error: ", login.data.error);
+          setLoading(false);
+          return Alert.alert(login.data.error.response.data.message);
+        }
+
+        console.log("login.data: ", login.data);
+
+        navigate("Index", {
+          type: params.type,
+          name:
+            params.type === "donation"
+              ? userPersonalData.firstName
+              : ongPersonalData.name,
+          token: login.data.token,
+        });
+      }
+    } catch (error: any) {
+      console.log("error na page password: ", error.response);
+      setLoading(false);
+      setError(
+        error.response?.data?.message ||
+          "Erro no servidor, tente novamente mais tarde."
+      );
+      return Alert.alert(
+        "ERRO: ",
+        error.response?.data?.message || "Erro no servidor"
+      );
+    }
   };
 
   return (
@@ -155,7 +227,7 @@ const RegisterPassword = () => {
             marginBottom: 9,
           }}
           rightIconName={!showConfirmPassword ? "eye-slash" : "eye"}
-          placeholder="Repitada a senha"
+          placeholder="Confirme a senha"
           secureTextEntry={!showConfirmPassword}
           rightIconPress={() => setShowConfirmPassword(!showConfirmPassword)}
           maxLength={20}
