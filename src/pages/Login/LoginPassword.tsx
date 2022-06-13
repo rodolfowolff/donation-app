@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTheme } from "styled-components";
 
 import { useGeneralContext } from "../../context/general";
+import { useRegister } from "../../context/register";
 
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
@@ -12,6 +13,7 @@ import Icon from "@expo/vector-icons/FontAwesome5";
 
 const LoginPassword = () => {
   const { api } = useGeneralContext();
+  const { userPersonalData, ongPersonalData } = useRegister();
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
   const { params }: any = useRoute();
@@ -24,20 +26,25 @@ const LoginPassword = () => {
   const handleLogin = async () => {
     setLoading(true);
     setError("");
+
     if (password.length < 8) {
       setError("Senha deve ter no mínimo 8 caracteres");
       setLoading(false);
       return alert("Senha deve ter no mínimo 8 caracteres");
     }
+
     try {
       const { data } = await api({
         entity: "authentication",
         action: params.type === "donation" ? "loginUser" : "loginOng",
         payload: {
-          document: `${params.document}`,
+          document:
+            params.type === "donation"
+              ? userPersonalData.document
+              : ongPersonalData.document,
           password: `${password}`,
         },
-      });
+      } as any);
 
       if (data.error) {
         console.log("data.error: ", data.error);

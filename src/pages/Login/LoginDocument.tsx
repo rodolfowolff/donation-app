@@ -7,21 +7,28 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useTheme } from "styled-components";
-
 import { cpfCnpjUnmask, cpfCnpjMask } from "js-essentials-functions";
-import { useGeneralContext } from "../../context/general";
 
+import { useGeneralContext } from "../../context/general";
+import { useRegister } from "../../context/register";
+
+import { useTheme } from "styled-components";
 import Icon from "@expo/vector-icons/FontAwesome5";
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
 import imageOnboard from "../../assets/images/onboarding-bg.png";
 
 const LoginDocument = () => {
+  const { params }: any = useRoute();
   const { api } = useGeneralContext();
+  const {
+    userPersonalData,
+    setUserPersonalData,
+    ongPersonalData,
+    setOngPersonalData,
+  } = useRegister();
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
-  const { params }: any = useRoute();
 
   const [document, setDocument] = useState("");
   const [error, setError] = useState("");
@@ -30,11 +37,40 @@ const LoginDocument = () => {
   const handleCheckDocument = async () => {
     setLoading(true);
     setError("");
-    if (document.length < 14) {
-      setError("CPF/CNPJ deve ter no mínimo 11 caracteres");
+    if (document === "" || document === undefined || document === null) {
+      setError("CPF/CNPJ não pode ser vazio");
       setLoading(false);
-      return alert("CPF/CNPJ deve ter no mínimo 11 caracteres");
+      return alert("CPF/CNPJ não pode ser vazio");
     }
+
+    if (params.type === "donation") {
+      if (document.length !== 14) {
+        setError("CPF deve ter 11 caracteres");
+        setLoading(false);
+        return alert("CPF deve ter 11 caracteres");
+      } else {
+        setUserPersonalData({
+          ...userPersonalData,
+          document: document,
+        });
+      }
+    } else if (params.type === "ong") {
+      if (document.length !== 17) {
+        setError("CNPJ deve ter 14 caracteres");
+        setLoading(false);
+        return alert("CNPJ deve ter 14 caracteres");
+      } else {
+        setOngPersonalData({
+          ...ongPersonalData,
+          document: document,
+        });
+      }
+    } else {
+      setError("Tipo de usuário não definido");
+      setLoading(false);
+      return alert("Tipo de usuário não definido");
+    }
+
     const documentUnMasked = cpfCnpjUnmask(document);
 
     if (!documentUnMasked) {
@@ -51,31 +87,38 @@ const LoginDocument = () => {
         payload: {
           document: `${documentUnMasked}`,
         },
-      });
+      } as any);
 
       if (data.error) {
+        console.log("data.error: ", data.error);
         setError(data.error.response.data.message);
         setLoading(false);
         return alert(data.error.response.data.message);
       }
 
-      console.log("data: ", data);
       setLoading(false);
       navigate("LoginPassword", {
         type: params.type,
-        document: documentUnMasked,
       });
     } catch (error: any) {
-      console.log("error na page document: ", error);
-      setError(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
-      );
-      setLoading(false);
-      return alert(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
-      );
+      if (error.response.data.message === "User not found" || "Ong not found") {
+        setLoading(false);
+        navigate("RegisterPersonalData", {
+          type: params.type,
+        });
+        return;
+      } else {
+        console.log("error na page document: ", error.response);
+        setError(
+          error.response?.data?.message ||
+            "Erro no servidor, tente novamente mais tarde."
+        );
+        setLoading(false);
+        return alert(
+          error.response?.data?.message ||
+            "Erro no servidor, tente novamente mais tarde."
+        );
+      }
     }
   };
 
@@ -118,8 +161,8 @@ const LoginDocument = () => {
               placeholder={`Informe ${
                 params.type === "donation" ? "seu CPF" : "o CNPJ"
               }`}
-              value={cpfCnpjMask(document)}
-              onChangeText={(text) => setDocument(text)}
+              value={cpfCnpjMask(document || "")}
+              onChangeText={(document) => setDocument(document)}
               maxLength={params.type === "donation" ? 14 : 18}
               keyboardType="numeric"
               autoCorrect={false}

@@ -6,23 +6,31 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   padding: 0 16px;
-  height: ${getStatusBarHeight(true) + 100}px;
+  height: ${getStatusBarHeight(true) + 90}px;
   padding-top: ${getStatusBarHeight(true) + 20}px;
-  padding-bottom: ${getBottomSpace() + 30}px;
+  padding-bottom: ${getBottomSpace() + 20}px;
   flex-direction: row;
-  align-items: center;
+  justify-content: space-between;
 `;
 
 export const Left = styled.View`
-  flex: 4;
-  /* margin: 16px 0;
-  height: ${getStatusBarHeight(true) + 160}px;
-  padding: ${getStatusBarHeight(true)}px; */
+  /* flex: 4; */
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 `;
 
 export const Center = styled.View`
   flex: 1;
   padding-left: 16px;
+  padding-right: 16px;
+  justify-content: center;
+  align-items: center;
 `;
 
-export const Right = styled.View``;
+export const Right = styled.View`
+  /* flex: 4; */
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+`;

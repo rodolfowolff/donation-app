@@ -1,9 +1,10 @@
 import React, { useRef } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { ThemeProvider } from "styled-components";
-import AppContainer from "./src/routes";
 import { GeneralProvider } from "./src/context/general";
+import { RegisterProvider } from "./src/context/register";
+import { ThemeProvider } from "styled-components";
 import { light } from "./src/theme";
+import AppContainer from "./src/routes";
 
 export default function App() {
   const routeNameRef = useRef<any>(null);
@@ -17,9 +18,11 @@ export default function App() {
       }}
     >
       <GeneralProvider>
-        <ThemeProvider theme={light}>
-          <AppContainer />
-        </ThemeProvider>
+        <RegisterProvider>
+          <ThemeProvider theme={light}>
+            <AppContainer />
+          </ThemeProvider>
+        </RegisterProvider>
       </GeneralProvider>
     </NavigationContainer>
   );
