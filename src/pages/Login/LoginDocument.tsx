@@ -101,6 +101,7 @@ const LoginDocument = () => {
         type: params.type,
       });
     } catch (error: any) {
+      console.log("error no check document: ", error);
       if (error.response.data.message === "User not found" || "Ong not found") {
         setLoading(false);
         navigate("RegisterPersonalData", {
@@ -163,7 +164,7 @@ const LoginDocument = () => {
               }`}
               value={cpfCnpjMask(document || "")}
               onChangeText={(document) => setDocument(document)}
-              maxLength={params.type === "donation" ? 14 : 18}
+              maxLength={params.type && params.type === "donation" ? 14 : 18}
               keyboardType="numeric"
               autoCorrect={false}
             />

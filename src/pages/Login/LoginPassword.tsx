@@ -56,7 +56,8 @@ const LoginPassword = () => {
       if (data) {
         navigate("Index", {
           type: params.type,
-          userName: data.user.firstName,
+          name:
+            params.type === "donation" ? data.user.firstName : data.ong.name,
           token: data.token,
         });
       }

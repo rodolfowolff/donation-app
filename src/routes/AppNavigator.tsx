@@ -20,7 +20,7 @@ declare global {
       RegisterPassword: { type: string };
       Index: {
         type: string;
-        userName: string;
+        name: string;
         token: string;
       };
     }

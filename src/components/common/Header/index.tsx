@@ -22,13 +22,13 @@ const Header = ({
   title,
   rightComponent,
 }: IHeaderProps) => {
-  const { navigate } = useNavigation();
+  const { goBack } = useNavigation();
 
   return (
     <S.Container>
       {back && (
         <S.Left>
-          <Pressable onPress={() => navigate("LoginDocument", { type })}>
+          <Pressable onPress={() => goBack()}>
             <Icon name="chevron-left" size={22} color="#000" />
           </Pressable>
         </S.Left>
