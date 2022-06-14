@@ -9,6 +9,5 @@ export const ContentHome = styled.View`
 `;
 
 export const ContentHeaderHome = styled.View`
-  /* padding: 0 16px; */
   margin-bottom: 2px;
 `;

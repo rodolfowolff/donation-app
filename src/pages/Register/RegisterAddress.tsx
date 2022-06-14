@@ -6,7 +6,13 @@ import { cepMask, cepUnmask } from "js-essentials-functions";
 import { useRegister } from "../../context/register";
 
 import { useTheme } from "styled-components";
-import { Header, Typography, Input, Button } from "../../components/common";
+import {
+  Header,
+  Typography,
+  Input,
+  Button,
+  Loading,
+} from "../../components/common";
 import { Container, ScrollContent } from "../../styles/global.style";
 import * as S from "./styles";
 import useFetch from "../../hooks/useFetch";
@@ -24,6 +30,7 @@ const RegisterAddress = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     if (data) {
       setAddressData({
         ...addressData,
@@ -32,29 +39,28 @@ const RegisterAddress = () => {
         city: data.city,
         state: data.state,
       });
-    } else if (error) {
-      setAddressData({
-        ...addressData,
-        zipCode: "",
-        street: "",
-        neighborhood: "",
-        city: "",
-        state: "",
-      });
-      Alert.alert("Erro", "Ocorreu um erro ao buscar o CEP, tente novamente");
+      setLoading(false);
     } else {
+      console.log("error no cep: ", error);
       setAddressData({
         ...addressData,
         zipCode: "",
         street: "",
+        number: "",
+        complement: "",
         neighborhood: "",
         city: "",
         state: "",
       });
+      setLoading(false);
+      Alert.alert("Erro", "Ocorreu um erro ao buscar o CEP, tente novamente");
     }
   }, [data]);
 
   const verifyFields = () => {
+    //
+    // fazer verificação de campos
+    //
     if (
       addressData.zipCode.length === 9 &&
       addressData.street.length > 3 &&
@@ -73,36 +79,19 @@ const RegisterAddress = () => {
     setLoading(true);
     const verify = verifyFields();
     if (!verify) {
+      setLoading(false);
       return;
     }
 
+    setLoading(false);
     navigate("RegisterPassword", {
       type: params.type,
     });
-    // if (firstName.length < 3 || firstName.length > 20) {
-    //   setLoading(false);
-    //   return alert("Nome deve ter no mínimo 3 caracteres");
-    // }
-    // if (params.type === "donation") {
-    //   if (lastName.length < 3 || lastName.length > 20) {
-    //     setLoading(false);
-    //     return alert(
-    //       "Sobrenome deve ter no mínimo 3 caracteres e no máximo 20"
-    //     );
-    //   }
-    // } else {
-    //   if (description.length < 10) {
-    //     setLoading(false);
-    //     return alert("Descrição deve ter no mínimo 10 caracteres");
-    //   }
-    // }
-    // setLoading(false);
-    // navigate("RegisterAddress", {
-    //   type: params.type,
-    // });
   };
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <Container style={{ backgroundColor: colors.bg }}>
       <StatusBar
         barStyle="dark-content"

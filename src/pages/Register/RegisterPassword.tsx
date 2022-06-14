@@ -7,13 +7,19 @@ import { useGeneralContext } from "../../context/general";
 import { useRegister } from "../../context/register";
 
 import { useTheme } from "styled-components";
-import { Header, Typography, Input, Button } from "../../components/common";
+import {
+  Header,
+  Typography,
+  Input,
+  Button,
+  Loading,
+} from "../../components/common";
 import { Container, ScrollContent } from "../../styles/global.style";
 import * as S from "./styles";
 
 const RegisterPassword = () => {
   const { params }: any = useRoute();
-  const { api } = useGeneralContext();
+  const { api, loading } = useGeneralContext();
   const {
     userPersonalData,
     setUserPersonalData,
@@ -26,14 +32,10 @@ const RegisterPassword = () => {
   const { colors } = useTheme();
 
   const [showPassword, setShowPassword] = useState(false);
-
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleRegisterPassword = async () => {
-    setLoading(true);
-
     if (params.type === "donation") {
       if (
         userPersonalData.password.length < 8 ||
@@ -41,7 +43,6 @@ const RegisterPassword = () => {
         confirmPassword.length < 8 ||
         confirmPassword.length > 16
       ) {
-        setLoading(false);
         Alert.alert(
           "Senha inválida",
           "A senha e confirmação deve ter entre 8 e 20 caracteres"
@@ -50,7 +51,6 @@ const RegisterPassword = () => {
       }
 
       if (userPersonalData.password !== confirmPassword) {
-        setLoading(false);
         Alert.alert(
           "Senha e confirmação diferentes",
           "A senha e confirmação deve ser iguais!"
@@ -62,7 +62,6 @@ const RegisterPassword = () => {
         ongPersonalData.password.length < 8 ||
         ongPersonalData.password.length > 20
       ) {
-        setLoading(false);
         Alert.alert(
           "Senha inválida",
           "A senha e confirmação deve ter entre 8 e 20 caracteres"
@@ -71,7 +70,6 @@ const RegisterPassword = () => {
       }
 
       if (ongPersonalData.password !== confirmPassword) {
-        setLoading(false);
         Alert.alert(
           "Senha e confirmação diferentes",
           "A senha e confirmação deve ser iguais!"
@@ -79,7 +77,6 @@ const RegisterPassword = () => {
         return;
       }
     } else {
-      setLoading(false);
       Alert.alert("Erro", "Tipo de usuário inválido");
       return;
     }
@@ -108,13 +105,11 @@ const RegisterPassword = () => {
 
       if (data.error) {
         console.log("data.error: ", data.error);
-        setLoading(false);
-        return Alert.alert(data.error.response.data.message);
+        Alert.alert(data.error.response.data.message);
+        return;
       }
 
       if (data && data.token) {
-        setLoading(false);
-
         await AsyncStorage.setItem("@token_donation_app", data.token);
         await AsyncStorage.setItem(
           "@personal_donation_app",
@@ -135,15 +130,17 @@ const RegisterPassword = () => {
       }
     } catch (error: any) {
       console.log("error na page password: ", error.response);
-      setLoading(false);
-      return Alert.alert(
+      Alert.alert(
         "ERRO: ",
         error.response?.data?.message || "Erro no servidor"
       );
+      return;
     }
   };
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <Container style={{ backgroundColor: colors.bg }}>
       <StatusBar
         barStyle="dark-content"

@@ -5,30 +5,31 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useGeneralContext } from "../../context/general";
 import { useRegister } from "../../context/register";
+import { useAuth } from "../../context/auth";
 
 import { useTheme } from "styled-components";
-import { Button, Typography, Input } from "../../components/common";
+import { Button, Typography, Input, Loading } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
 import imageOnboard from "../../assets/images/onboarding-bg.png";
 import Icon from "@expo/vector-icons/FontAwesome5";
 
 const LoginPassword = () => {
-  const { api } = useGeneralContext();
+  const { api, loading } = useGeneralContext();
   const { userPersonalData, ongPersonalData, resetState } = useRegister();
+  const { setIsAuth, setPersonalData } = useAuth();
   const { colors } = useTheme();
-  const { goBack, navigate } = useNavigation();
+  const { goBack } = useNavigation();
   const { params }: any = useRoute();
 
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    setLoading(true);
-
-    if (password.length < 8) {
-      setLoading(false);
-      Alert.alert("Senha inválida", "Senha deve ter no mínimo 8 caracteres");
+    if (password === "" || password.length < 8 || password.length > 20) {
+      Alert.alert(
+        "Senha inválida",
+        "Senha deve ter no mínimo 8 e no máximo 20 caracteres"
+      );
       return;
     }
 
@@ -47,17 +48,12 @@ const LoginPassword = () => {
 
       if (data.error) {
         console.log("data.error: ", data.error);
-        setLoading(false);
         Alert.alert(
           "Erro",
           data.error.response.data.message || "Erro desconhecido"
         );
         return;
-      }
-
-      if (data && data.token) {
-        setLoading(false);
-
+      } else if (data && data.token) {
         await AsyncStorage.setItem("@token_donation_app", data.token);
         await AsyncStorage.setItem(
           "@personal_donation_app",
@@ -67,32 +63,34 @@ const LoginPassword = () => {
         );
 
         resetState();
-
-        navigate("Index", {
-          type: params.type,
-          name:
-            params.type === "donation" ? data.user.firstName : data.ong.name,
-          token: data.token,
-        });
+        setIsAuth(true);
+        setPersonalData(params.type === "donation" ? data.user : data.ong);
 
         return;
       } else {
-        setLoading(false);
         Alert.alert("Erro", "Erro desconhecido");
         return;
       }
     } catch (error: any) {
       console.log("error na page password: ", error.response.data || error);
-      setLoading(false);
+      if (
+        error.response.data.message === "Ong or password invalid" ||
+        error.response.data.message === "User or password invalid"
+      ) {
+        Alert.alert("Erro", "Documento ou senha inválidos");
+        return;
+      }
       Alert.alert(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
+        "Erro no servidor",
+        "Erro ao conectar com nosso servidor, tente novamente mais tarde."
       );
       return;
     }
   };
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <Container style={{ backgroundColor: colors.primary }}>
       <StatusBar
         backgroundColor="transparent"

@@ -6,7 +6,13 @@ import { telephoneMask, dateMask } from "js-essentials-functions";
 import { useRegister } from "../../context/register";
 
 import { useTheme } from "styled-components";
-import { Header, Typography, Input, Button } from "../../components/common";
+import {
+  Header,
+  Typography,
+  Input,
+  Button,
+  Loading,
+} from "../../components/common";
 import { Container, ScrollContent } from "../../styles/global.style";
 import * as S from "./styles";
 
@@ -20,8 +26,6 @@ const RegisterPersonalData = () => {
   } = useRegister();
   const { navigate } = useNavigation();
   const { colors } = useTheme();
-
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const verifyFields = () => {
@@ -122,20 +126,23 @@ const RegisterPersonalData = () => {
 
   const handleRegisterPersonalData = () => {
     setLoading(true);
-    setError("");
-
     const verify = verifyFields();
+
     if (!verify) {
       setLoading(false);
       return;
     }
 
+    setLoading(false);
     navigate("RegisterAddress", {
       type: params.type,
     });
+    return;
   };
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <Container style={{ backgroundColor: colors.bg }}>
       <StatusBar
         barStyle="dark-content"

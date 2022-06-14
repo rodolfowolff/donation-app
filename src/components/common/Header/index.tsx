@@ -8,7 +8,6 @@ import { Typography } from "../Text";
 
 interface IHeaderProps {
   back?: boolean;
-  type?: "donation" | "ong";
   leftComponent?: any;
   title?: string;
   rightComponent?: any;
@@ -17,7 +16,6 @@ interface IHeaderProps {
 
 const Header = ({
   back,
-  type = "donation",
   leftComponent,
   title,
   rightComponent,

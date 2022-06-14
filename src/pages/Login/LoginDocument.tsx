@@ -15,13 +15,13 @@ import { useRegister } from "../../context/register";
 
 import { useTheme } from "styled-components";
 import Icon from "@expo/vector-icons/FontAwesome5";
-import { Button, Typography, Input } from "../../components/common";
+import { Button, Typography, Input, Loading } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
 import imageOnboard from "../../assets/images/onboarding-bg.png";
 
 const LoginDocument = () => {
   const { params }: any = useRoute();
-  const { api } = useGeneralContext();
+  const { api, loading } = useGeneralContext();
   const {
     userPersonalData,
     setUserPersonalData,
@@ -32,20 +32,15 @@ const LoginDocument = () => {
   const { goBack, navigate } = useNavigation();
 
   const [document, setDocument] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleCheckDocument = async () => {
-    setLoading(true);
-
     if (document === "" || document === undefined || document === null) {
-      setLoading(false);
       Alert.alert("CPF/CNPJ inválido", "CPF/CNPJ não pode ser vazio");
       return;
     }
 
     if (params.type === "donation") {
       if (document.length !== 14) {
-        setLoading(false);
         Alert.alert("CPF inválido", "CPF deve ter 11 caracteres");
         return;
       } else {
@@ -56,7 +51,6 @@ const LoginDocument = () => {
       }
     } else if (params.type === "ong") {
       if (document.length !== 17) {
-        setLoading(false);
         Alert.alert("CNPJ inválido", "CNPJ deve ter 14 caracteres");
         return;
       } else {
@@ -66,7 +60,6 @@ const LoginDocument = () => {
         });
       }
     } else {
-      setLoading(false);
       Alert.alert("Usuário inválido", "Tipo de usuário inválido");
       return;
     }
@@ -74,7 +67,6 @@ const LoginDocument = () => {
     const documentUnMasked = cpfCnpjUnmask(document);
 
     if (!documentUnMasked) {
-      setLoading(false);
       Alert.alert(
         "Documento inválido",
         "CPF/CNPJ inválido para tirar os caracteres especiais"
@@ -93,8 +85,6 @@ const LoginDocument = () => {
       } as any);
 
       if (data.status === true) {
-        setLoading(false);
-
         params.type === "donation"
           ? setUserPersonalData({
               ...userPersonalData,
@@ -116,14 +106,12 @@ const LoginDocument = () => {
 
       if (data.status === false) {
         console.log("data.error false: ", data);
-        setLoading(false);
         navigate("RegisterPersonalData", {
           type: params.type,
         });
         return;
       } else {
         console.log("data.error: ", data);
-        setLoading(false);
         Alert.alert("Erro", "Erro ao verificar documento");
         return;
       }
@@ -134,7 +122,9 @@ const LoginDocument = () => {
     }
   };
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}

@@ -1,19 +1,51 @@
-import React from "react";
-import { FlatList, StatusBar, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Alert,
+  FlatList,
+  StatusBar,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { useRegister } from "../../context/register";
+import { useAuth } from "../../context/auth";
+import useFetch from "../../hooks/useFetch";
 import { useTheme } from "styled-components";
+import { useNavigation } from "@react-navigation/native";
 
-import { Header, Typography, Input } from "../../components/common";
+import { Header, Typography, Input, Loading } from "../../components/common";
 import { Container } from "../../styles/global.style";
 import * as S from "./styles";
 import Icon from "@expo/vector-icons/FontAwesome5";
 import CardOng from "../../components/common/CardOng";
 
 const Home = () => {
-  const { userPersonalData, ongPersonalData } = useRegister();
+  const { setIsAuth, personalData } = useAuth();
+  const { data, error } = useFetch("/ongs/findall");
   const { colors } = useTheme();
-  const testeRender = () => <CardOng />;
+  const { navigate } = useNavigation();
+
+  const [loading, setLoading] = useState(false);
+
+  const renderOngs = ({ item }: any) => <CardOng ong={item} />;
+
+  const handleLogout = async () => {
+    setLoading(true);
+
+    await AsyncStorage.clear();
+    setIsAuth(false);
+
+    Alert.alert("Sucesso", "Você saiu com sucesso!");
+    setLoading(false);
+
+    return;
+  };
+
+  if (error) {
+    Alert.alert("Erro", "Não foi possível carregar as ONGs");
+  }
+
+  if (!data || loading) return <Loading />;
 
   return (
     <Container>
@@ -28,12 +60,12 @@ const Home = () => {
             <View>
               <Typography color="black" size="xlarge" weight="bold">
                 Olá,{" "}
-                {userPersonalData.firstName
-                  ? userPersonalData.firstName
-                  : ongPersonalData.name}
+                {personalData.firstName
+                  ? personalData.firstName
+                  : personalData.name}
               </Typography>
               <Typography color="gray" size="medium" weight="regular">
-                {userPersonalData.firstName
+                {personalData.firstName
                   ? "Encontre ONGs que precisam de sua ajuda."
                   : "Seja bem-vindo(a) ao app."}
               </Typography>
@@ -41,6 +73,12 @@ const Home = () => {
           }
           rightComponent={<Icon name="bell" size={24} color={colors.black} />}
         />
+
+        <TouchableOpacity onPress={() => handleLogout()}>
+          <Typography color="black" size="xlarge" weight="bold">
+            Deslogar teste
+          </Typography>
+        </TouchableOpacity>
 
         <S.ContentHeaderHome>
           <Input
@@ -63,11 +101,11 @@ const Home = () => {
           </Typography>
         </S.ContentHeaderHome>
         <FlatList
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          data={data || []}
           contentContainerStyle={{ paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.toString()}
-          renderItem={testeRender}
+          keyExtractor={(item) => item.id}
+          renderItem={renderOngs}
         />
       </S.ContentHome>
     </Container>
