@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { StatusBar, View, Pressable, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useTheme } from "styled-components";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useGeneralContext } from "../../context/general";
 import { useRegister } from "../../context/register";
 
+import { useTheme } from "styled-components";
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
 import imageOnboard from "../../assets/images/onboarding-bg.png";
@@ -13,7 +14,7 @@ import Icon from "@expo/vector-icons/FontAwesome5";
 
 const LoginPassword = () => {
   const { api } = useGeneralContext();
-  const { userPersonalData, ongPersonalData } = useRegister();
+  const { userPersonalData, ongPersonalData, resetState } = useRegister();
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
   const { params }: any = useRoute();
@@ -55,12 +56,17 @@ const LoginPassword = () => {
       }
 
       if (data && data.token) {
-        console.log("type: ", params.type);
-        console.log(
-          "name: ",
-          params.type === "donation" ? data.user.firstName : data.ong.name
+        setLoading(false);
+
+        await AsyncStorage.setItem("@token_donation_app", data.token);
+        await AsyncStorage.setItem(
+          "@personal_donation_app",
+          params.type === "donation"
+            ? JSON.stringify(data.user)
+            : JSON.stringify(data.ong)
         );
-        console.log("data.token: ", data.token);
+
+        resetState();
 
         navigate("Index", {
           type: params.type,
@@ -68,14 +74,21 @@ const LoginPassword = () => {
             params.type === "donation" ? data.user.firstName : data.ong.name,
           token: data.token,
         });
+
+        return;
+      } else {
+        setLoading(false);
+        Alert.alert("Erro", "Erro desconhecido");
+        return;
       }
     } catch (error: any) {
-      console.log("error na page password: ", error);
+      console.log("error na page password: ", error.response.data || error);
       setLoading(false);
-      return alert(
+      Alert.alert(
         error.response?.data?.message ||
           "Erro no servidor, tente novamente mais tarde."
       );
+      return;
     }
   };
 

@@ -94,14 +94,17 @@ const LoginDocument = () => {
 
       if (data.status === true) {
         setLoading(false);
+
         params.type === "donation"
           ? setUserPersonalData({
               ...userPersonalData,
               firstName: data.name,
+              document: documentUnMasked,
             })
           : setOngPersonalData({
               ...ongPersonalData,
               name: data.name,
+              document: documentUnMasked,
             });
 
         navigate("LoginPassword", {

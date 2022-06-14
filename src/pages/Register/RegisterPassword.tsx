@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StatusBar, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { cepMask } from "js-essentials-functions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useGeneralContext } from "../../context/general";
 import { useRegister } from "../../context/register";
@@ -20,6 +20,7 @@ const RegisterPassword = () => {
     ongPersonalData,
     setOngPersonalData,
     addressData,
+    resetState,
   } = useRegister();
   const { navigate } = useNavigation();
   const { colors } = useTheme();
@@ -113,6 +114,17 @@ const RegisterPassword = () => {
 
       if (data && data.token) {
         setLoading(false);
+
+        await AsyncStorage.setItem("@token_donation_app", data.token);
+        await AsyncStorage.setItem(
+          "@personal_donation_app",
+          params.type === "donation"
+            ? JSON.stringify(data.user)
+            : JSON.stringify(data.ong)
+        );
+
+        resetState();
+
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
 
         navigate("Index", {
