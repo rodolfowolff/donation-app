@@ -28,14 +28,14 @@ const Home = () => {
             <View>
               <Typography color="black" size="xlarge" weight="bold">
                 Olá,{" "}
-                {userPersonalData.firstName !== ""
+                {userPersonalData.firstName
                   ? userPersonalData.firstName
                   : ongPersonalData.name}
               </Typography>
               <Typography color="gray" size="medium" weight="regular">
-                {userPersonalData.firstName !== ""
-                  ? "Seja bem-vindo(a) ao app."
-                  : "Encontre as ONGs que precisam de sua ajuda."}
+                {userPersonalData.firstName
+                  ? "Encontre ONGs que precisam de sua ajuda."
+                  : "Seja bem-vindo(a) ao app."}
               </Typography>
             </View>
           }

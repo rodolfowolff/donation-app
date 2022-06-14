@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StatusBar, View, Pressable } from "react-native";
+import { StatusBar, View, Pressable, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTheme } from "styled-components";
 
@@ -20,17 +20,15 @@ const LoginPassword = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
-    setError("");
 
     if (password.length < 8) {
-      setError("Senha deve ter no mínimo 8 caracteres");
       setLoading(false);
-      return alert("Senha deve ter no mínimo 8 caracteres");
+      Alert.alert("Senha inválida", "Senha deve ter no mínimo 8 caracteres");
+      return;
     }
 
     try {
@@ -48,12 +46,22 @@ const LoginPassword = () => {
 
       if (data.error) {
         console.log("data.error: ", data.error);
-        setError(data.error.response.data.message);
         setLoading(false);
-        return alert(data.error.response.data.message);
+        Alert.alert(
+          "Erro",
+          data.error.response.data.message || "Erro desconhecido"
+        );
+        return;
       }
 
-      if (data) {
+      if (data && data.token) {
+        console.log("type: ", params.type);
+        console.log(
+          "name: ",
+          params.type === "donation" ? data.user.firstName : data.ong.name
+        );
+        console.log("data.token: ", data.token);
+
         navigate("Index", {
           type: params.type,
           name:
@@ -63,10 +71,6 @@ const LoginPassword = () => {
       }
     } catch (error: any) {
       console.log("error na page password: ", error);
-      setError(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
-      );
       setLoading(false);
       return alert(
         error.response?.data?.message ||

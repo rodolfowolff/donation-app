@@ -58,7 +58,6 @@ const RegisterPersonalData = () => {
         return false;
       }
 
-      console.log(userPersonalData.telephone.length);
       if (
         userPersonalData.telephone.length < 14 ||
         userPersonalData.telephone.length > 15
@@ -131,8 +130,6 @@ const RegisterPersonalData = () => {
       return;
     }
 
-    console.log("userPersonalData: ", userPersonalData);
-    console.log("ongPersonalData: ", ongPersonalData);
     navigate("RegisterAddress", {
       type: params.type,
     });

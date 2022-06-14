@@ -28,12 +28,10 @@ const RegisterPassword = () => {
 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegisterPassword = async () => {
     setLoading(true);
-    setError("");
 
     if (params.type === "donation") {
       if (
@@ -51,7 +49,6 @@ const RegisterPassword = () => {
       }
 
       if (userPersonalData.password !== confirmPassword) {
-        setError("Senhas não conferem");
         setLoading(false);
         Alert.alert(
           "Senha e confirmação diferentes",
@@ -73,7 +70,6 @@ const RegisterPassword = () => {
       }
 
       if (ongPersonalData.password !== confirmPassword) {
-        setError("Senhas não conferem");
         setLoading(false);
         Alert.alert(
           "Senha e confirmação diferentes",
@@ -102,7 +98,6 @@ const RegisterPassword = () => {
             },
           };
 
-    console.log("payload: ", payload);
     try {
       const { data } = await api({
         entity: "register",
@@ -110,61 +105,25 @@ const RegisterPassword = () => {
         payload,
       } as any);
 
-      console.log("data: ", data);
-
       if (data.error) {
         console.log("data.error: ", data.error);
-        setError(data.error.response.data.message);
         setLoading(false);
         return Alert.alert(data.error.response.data.message);
       }
 
-      if (
-        (data && data.message === "Ong created successfully") ||
-        data.message === "User created successfully"
-      ) {
+      if (data && data.token) {
         setLoading(false);
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
 
-        const login = await api({
-          entity: "authentication",
-          action: params.type === "donation" ? "loginUser" : "loginOng",
-          payload: {
-            document:
-              params.type === "donation"
-                ? userPersonalData.document
-                : ongPersonalData.document,
-            password:
-              params.type === "donation"
-                ? `${userPersonalData.password}`
-                : `${ongPersonalData.password}`,
-          },
-        } as any);
-
-        if (login.data.error) {
-          console.log("login.data.error: ", login.data.error);
-          setLoading(false);
-          return Alert.alert(login.data.error.response.data.message);
-        }
-
-        console.log("login.data: ", login.data);
-
         navigate("Index", {
           type: params.type,
-          name:
-            params.type === "donation"
-              ? userPersonalData.firstName
-              : ongPersonalData.name,
-          token: login.data.token,
+          name: params.type === "donation" ? data.user : data.ong,
+          token: data.token,
         });
       }
     } catch (error: any) {
       console.log("error na page password: ", error.response);
       setLoading(false);
-      setError(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
-      );
       return Alert.alert(
         "ERRO: ",
         error.response?.data?.message || "Erro no servidor"

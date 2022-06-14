@@ -5,6 +5,7 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { cpfCnpjUnmask, cpfCnpjMask } from "js-essentials-functions";
@@ -31,23 +32,22 @@ const LoginDocument = () => {
   const { goBack, navigate } = useNavigation();
 
   const [document, setDocument] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleCheckDocument = async () => {
     setLoading(true);
-    setError("");
+
     if (document === "" || document === undefined || document === null) {
-      setError("CPF/CNPJ não pode ser vazio");
       setLoading(false);
-      return alert("CPF/CNPJ não pode ser vazio");
+      Alert.alert("CPF/CNPJ inválido", "CPF/CNPJ não pode ser vazio");
+      return;
     }
 
     if (params.type === "donation") {
       if (document.length !== 14) {
-        setError("CPF deve ter 11 caracteres");
         setLoading(false);
-        return alert("CPF deve ter 11 caracteres");
+        Alert.alert("CPF inválido", "CPF deve ter 11 caracteres");
+        return;
       } else {
         setUserPersonalData({
           ...userPersonalData,
@@ -56,9 +56,9 @@ const LoginDocument = () => {
       }
     } else if (params.type === "ong") {
       if (document.length !== 17) {
-        setError("CNPJ deve ter 14 caracteres");
         setLoading(false);
-        return alert("CNPJ deve ter 14 caracteres");
+        Alert.alert("CNPJ inválido", "CNPJ deve ter 14 caracteres");
+        return;
       } else {
         setOngPersonalData({
           ...ongPersonalData,
@@ -66,16 +66,19 @@ const LoginDocument = () => {
         });
       }
     } else {
-      setError("Tipo de usuário não definido");
       setLoading(false);
-      return alert("Tipo de usuário não definido");
+      Alert.alert("Usuário inválido", "Tipo de usuário inválido");
+      return;
     }
 
     const documentUnMasked = cpfCnpjUnmask(document);
 
     if (!documentUnMasked) {
-      setError("Por favor, informe um documento válido.");
       setLoading(false);
+      Alert.alert(
+        "Documento inválido",
+        "CPF/CNPJ inválido para tirar os caracteres especiais"
+      );
       return;
     }
 
@@ -89,37 +92,42 @@ const LoginDocument = () => {
         },
       } as any);
 
-      if (data.error) {
-        console.log("data.error: ", data.error);
-        setError(data.error.response.data.message);
+      if (data.status === true) {
         setLoading(false);
-        return alert(data.error.response.data.message);
+        params.type === "donation"
+          ? setUserPersonalData({
+              ...userPersonalData,
+              firstName: data.name,
+            })
+          : setOngPersonalData({
+              ...ongPersonalData,
+              name: data.name,
+            });
+
+        navigate("LoginPassword", {
+          type: params.type,
+        });
+
+        return;
       }
 
-      setLoading(false);
-      navigate("LoginPassword", {
-        type: params.type,
-      });
-    } catch (error: any) {
-      console.log("error no check document: ", error);
-      if (error.response.data.message === "User not found" || "Ong not found") {
+      if (data.status === false) {
+        console.log("data.error false: ", data);
         setLoading(false);
         navigate("RegisterPersonalData", {
           type: params.type,
         });
         return;
       } else {
-        console.log("error na page document: ", error.response);
-        setError(
-          error.response?.data?.message ||
-            "Erro no servidor, tente novamente mais tarde."
-        );
+        console.log("data.error: ", data);
         setLoading(false);
-        return alert(
-          error.response?.data?.message ||
-            "Erro no servidor, tente novamente mais tarde."
-        );
+        Alert.alert("Erro", "Erro ao verificar documento");
+        return;
       }
+    } catch (error: any) {
+      console.log("error no check document: ", error);
+      Alert.alert("ERRO", "Erro no servidor, tente novamente mais tarde.");
+      return;
     }
   };
 
