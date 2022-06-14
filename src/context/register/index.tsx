@@ -36,6 +36,7 @@ export type RegisterContextType = {
   setOngPersonalData: React.Dispatch<React.SetStateAction<IOngPersonalData>>;
   addressData: IAddressData;
   setAddressData: React.Dispatch<React.SetStateAction<IAddressData>>;
+  resetState: () => void;
 };
 
 const RegisterContext = createContext<RegisterContextType>(
@@ -43,34 +44,21 @@ const RegisterContext = createContext<RegisterContextType>(
 );
 
 const RegisterProvider = ({ children }: { children: React.ReactNode }) => {
-  const [userPersonalData, setUserPersonalData] = useState<IUserPersonalData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    document: "",
-    password: "",
-    telephone: "",
-    birthDate: "",
-  } as IUserPersonalData);
+  const [userPersonalData, setUserPersonalData] = useState<IUserPersonalData>(
+    {} as IUserPersonalData
+  );
+  const [ongPersonalData, setOngPersonalData] = useState<IOngPersonalData>(
+    {} as IOngPersonalData
+  );
+  const [addressData, setAddressData] = useState<IAddressData>(
+    {} as IAddressData
+  );
 
-  const [ongPersonalData, setOngPersonalData] = useState<IOngPersonalData>({
-    name: "",
-    email: "",
-    document: "",
-    description: "",
-    password: "",
-    telephone: "",
-  } as IOngPersonalData);
-
-  const [addressData, setAddressData] = useState<IAddressData>({
-    zipCode: "",
-    street: "",
-    number: "",
-    complement: "",
-    neighborhood: "",
-    city: "",
-    state: "",
-  } as IAddressData);
+  const resetState = () => {
+    setUserPersonalData({} as IUserPersonalData);
+    setOngPersonalData({} as IOngPersonalData);
+    setAddressData({} as IAddressData);
+  };
 
   const value = {
     userPersonalData,
@@ -79,6 +67,7 @@ const RegisterProvider = ({ children }: { children: React.ReactNode }) => {
     setOngPersonalData,
     addressData,
     setAddressData,
+    resetState,
   };
 
   return (
