@@ -1,21 +1,48 @@
-import React from "react";
-import { FlatList, StatusBar, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Alert,
+  FlatList,
+  StatusBar,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { useAuth } from "../../context/auth";
 import { useRegister } from "../../context/register";
 import { useTheme } from "styled-components";
 
-import { Header, Typography, Input } from "../../components/common";
+import { Header, Typography, Input, Loading } from "../../components/common";
 import { Container } from "../../styles/global.style";
 import * as S from "./styles";
 import Icon from "@expo/vector-icons/FontAwesome5";
 import CardOng from "../../components/common/CardOng";
 
 const Home = () => {
-  const { userPersonalData, ongPersonalData } = useRegister();
+  const { setIsAuth, personalData } = useAuth();
   const { colors } = useTheme();
+
+  const [loading, setLoading] = useState(false);
+
   const testeRender = () => <CardOng />;
 
-  return (
+  console.log("personalData: ", personalData);
+
+  const handleLogout = async () => {
+    setLoading(true);
+
+    await AsyncStorage.clear();
+    setIsAuth(false);
+
+    Alert.alert("Sucesso", "Você saiu com sucesso!");
+    setLoading(false);
+
+    return;
+  };
+
+  return loading ? (
+    <Loading />
+  ) : (
     <Container>
       <StatusBar
         barStyle="dark-content"
@@ -28,12 +55,12 @@ const Home = () => {
             <View>
               <Typography color="black" size="xlarge" weight="bold">
                 Olá,{" "}
-                {userPersonalData.firstName
-                  ? userPersonalData.firstName
-                  : ongPersonalData.name}
+                {personalData.firstName
+                  ? personalData.firstName
+                  : personalData.name}
               </Typography>
               <Typography color="gray" size="medium" weight="regular">
-                {userPersonalData.firstName
+                {personalData.firstName
                   ? "Encontre ONGs que precisam de sua ajuda."
                   : "Seja bem-vindo(a) ao app."}
               </Typography>
@@ -41,6 +68,12 @@ const Home = () => {
           }
           rightComponent={<Icon name="bell" size={24} color={colors.black} />}
         />
+
+        <TouchableOpacity onPress={() => handleLogout()}>
+          <Typography color="black" size="xlarge" weight="bold">
+            Deslogar teste
+          </Typography>
+        </TouchableOpacity>
 
         <S.ContentHeaderHome>
           <Input

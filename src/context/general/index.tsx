@@ -19,6 +19,9 @@ export type GeneralContextType = {
     params,
     headers,
   }: ApiParams) => Promise<{ data: any }>;
+  theme: string;
+  setTheme: (theme: string) => void;
+  loading: boolean;
 };
 
 const GeneralContext = createContext<GeneralContextType>(
@@ -27,6 +30,7 @@ const GeneralContext = createContext<GeneralContextType>(
 
 const GeneralProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState("light");
+  const [loading, setLoading] = useState(false);
 
   const api = useCallback(
     async ({
@@ -37,6 +41,7 @@ const GeneralProvider = ({ children }: { children: React.ReactNode }) => {
       params,
       headers = {},
     }: ApiParams) => {
+      setLoading(true);
       try {
         // eslint-disable-next-line
         // @ts-ignore
@@ -49,12 +54,14 @@ const GeneralProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error: any) {
         console.info("API Error: ", error);
         throw error;
+      } finally {
+        setLoading(false);
       }
     },
     []
   );
 
-  const value = { api, theme, setTheme };
+  const value = { api, theme, setTheme, loading };
 
   return (
     <GeneralContext.Provider value={value}>{children}</GeneralContext.Provider>

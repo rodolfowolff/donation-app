@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { useAuth } from "../context/auth";
+
 //Pages
-import Loading from "../pages/Loading";
+import { Loading } from "../components/common";
 import Onboarding from "../pages/Onboarding";
 import LoginDocument from "../pages/Login/LoginDocument";
 import LoginPassword from "../pages/Login/LoginPassword";
@@ -15,6 +17,7 @@ import TabNavigator from "./TabNavigator";
 declare global {
   namespace ReactNavigation {
     interface RootParamList {
+      Loading: undefined;
       Onboarding: undefined;
       LoginDocument: { type: string };
       LoginPassword: { type: string };
@@ -33,13 +36,18 @@ declare global {
 const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
-  const [isLogged, setIsLogged] = useState(false);
+  const { isAuth, setIsAuth, setPersonalData } = useAuth();
   const [loading, setLoading] = useState(true);
 
   const verifyToken = async () => {
     const token = await AsyncStorage.getItem("@token_donation_app");
+    const personalData = await AsyncStorage.getItem("@personal_donation_app");
+
     if (token) {
-      setIsLogged(true);
+      setIsAuth(true);
+      if (personalData) {
+        setPersonalData(JSON.parse(personalData));
+      }
     }
     setLoading(false);
   };
@@ -55,10 +63,7 @@ const AppNavigator = () => {
       // initialRouteName={"Onboarding"}
     >
       {loading && <Stack.Screen name="Loading" component={Loading} />}
-      {!loading && isLogged && (
-        <Stack.Screen name="Index" component={TabNavigator} />
-      )}
-      {!loading && !isLogged && (
+      {!loading && !isAuth && (
         //@ts-ignore
         <Stack.Group>
           <Stack.Screen name="Onboarding" component={Onboarding} />
@@ -71,6 +76,9 @@ const AppNavigator = () => {
           <Stack.Screen name="RegisterAddress" component={RegisterAddress} />
           <Stack.Screen name="RegisterPassword" component={RegisterPassword} />
         </Stack.Group>
+      )}
+      {!loading && isAuth && (
+        <Stack.Screen name="Index" component={TabNavigator} />
       )}
     </Stack.Navigator>
   );
