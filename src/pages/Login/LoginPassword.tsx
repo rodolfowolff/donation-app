@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { StatusBar, View, Pressable } from "react-native";
+import { StatusBar, View, Pressable, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTheme } from "styled-components";
 
 import { useGeneralContext } from "../../context/general";
+import { useRegister } from "../../context/register";
 
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
@@ -12,53 +13,64 @@ import Icon from "@expo/vector-icons/FontAwesome5";
 
 const LoginPassword = () => {
   const { api } = useGeneralContext();
+  const { userPersonalData, ongPersonalData } = useRegister();
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
   const { params }: any = useRoute();
 
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
-    setError("");
+
     if (password.length < 8) {
-      setError("Senha deve ter no mínimo 8 caracteres");
       setLoading(false);
-      return alert("Senha deve ter no mínimo 8 caracteres");
+      Alert.alert("Senha inválida", "Senha deve ter no mínimo 8 caracteres");
+      return;
     }
+
     try {
       const { data } = await api({
         entity: "authentication",
         action: params.type === "donation" ? "loginUser" : "loginOng",
         payload: {
-          document: `${params.document}`,
+          document:
+            params.type === "donation"
+              ? userPersonalData.document
+              : ongPersonalData.document,
           password: `${password}`,
         },
-      });
+      } as any);
 
       if (data.error) {
         console.log("data.error: ", data.error);
-        setError(data.error.response.data.message);
         setLoading(false);
-        return alert(data.error.response.data.message);
+        Alert.alert(
+          "Erro",
+          data.error.response.data.message || "Erro desconhecido"
+        );
+        return;
       }
 
-      if (data) {
+      if (data && data.token) {
+        console.log("type: ", params.type);
+        console.log(
+          "name: ",
+          params.type === "donation" ? data.user.firstName : data.ong.name
+        );
+        console.log("data.token: ", data.token);
+
         navigate("Index", {
           type: params.type,
-          userName: data.user.firstName,
+          name:
+            params.type === "donation" ? data.user.firstName : data.ong.name,
           token: data.token,
         });
       }
     } catch (error: any) {
       console.log("error na page password: ", error);
-      setError(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
-      );
       setLoading(false);
       return alert(
         error.response?.data?.message ||

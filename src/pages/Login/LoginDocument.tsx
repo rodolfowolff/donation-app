@@ -5,41 +5,80 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { useTheme } from "styled-components";
-
 import { cpfCnpjUnmask, cpfCnpjMask } from "js-essentials-functions";
-import { useGeneralContext } from "../../context/general";
 
+import { useGeneralContext } from "../../context/general";
+import { useRegister } from "../../context/register";
+
+import { useTheme } from "styled-components";
 import Icon from "@expo/vector-icons/FontAwesome5";
 import { Button, Typography, Input } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
 import imageOnboard from "../../assets/images/onboarding-bg.png";
 
 const LoginDocument = () => {
+  const { params }: any = useRoute();
   const { api } = useGeneralContext();
+  const {
+    userPersonalData,
+    setUserPersonalData,
+    ongPersonalData,
+    setOngPersonalData,
+  } = useRegister();
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
-  const { params }: any = useRoute();
 
   const [document, setDocument] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleCheckDocument = async () => {
     setLoading(true);
-    setError("");
-    if (document.length < 14) {
-      setError("CPF/CNPJ deve ter no mínimo 11 caracteres");
+
+    if (document === "" || document === undefined || document === null) {
       setLoading(false);
-      return alert("CPF/CNPJ deve ter no mínimo 11 caracteres");
+      Alert.alert("CPF/CNPJ inválido", "CPF/CNPJ não pode ser vazio");
+      return;
     }
+
+    if (params.type === "donation") {
+      if (document.length !== 14) {
+        setLoading(false);
+        Alert.alert("CPF inválido", "CPF deve ter 11 caracteres");
+        return;
+      } else {
+        setUserPersonalData({
+          ...userPersonalData,
+          document: document,
+        });
+      }
+    } else if (params.type === "ong") {
+      if (document.length !== 17) {
+        setLoading(false);
+        Alert.alert("CNPJ inválido", "CNPJ deve ter 14 caracteres");
+        return;
+      } else {
+        setOngPersonalData({
+          ...ongPersonalData,
+          document: document,
+        });
+      }
+    } else {
+      setLoading(false);
+      Alert.alert("Usuário inválido", "Tipo de usuário inválido");
+      return;
+    }
+
     const documentUnMasked = cpfCnpjUnmask(document);
 
     if (!documentUnMasked) {
-      setError("Por favor, informe um documento válido.");
       setLoading(false);
+      Alert.alert(
+        "Documento inválido",
+        "CPF/CNPJ inválido para tirar os caracteres especiais"
+      );
       return;
     }
 
@@ -51,31 +90,44 @@ const LoginDocument = () => {
         payload: {
           document: `${documentUnMasked}`,
         },
-      });
+      } as any);
 
-      if (data.error) {
-        setError(data.error.response.data.message);
+      if (data.status === true) {
         setLoading(false);
-        return alert(data.error.response.data.message);
+        params.type === "donation"
+          ? setUserPersonalData({
+              ...userPersonalData,
+              firstName: data.name,
+            })
+          : setOngPersonalData({
+              ...ongPersonalData,
+              name: data.name,
+            });
+
+        navigate("LoginPassword", {
+          type: params.type,
+        });
+
+        return;
       }
 
-      console.log("data: ", data);
-      setLoading(false);
-      navigate("LoginPassword", {
-        type: params.type,
-        document: documentUnMasked,
-      });
+      if (data.status === false) {
+        console.log("data.error false: ", data);
+        setLoading(false);
+        navigate("RegisterPersonalData", {
+          type: params.type,
+        });
+        return;
+      } else {
+        console.log("data.error: ", data);
+        setLoading(false);
+        Alert.alert("Erro", "Erro ao verificar documento");
+        return;
+      }
     } catch (error: any) {
-      console.log("error na page document: ", error);
-      setError(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
-      );
-      setLoading(false);
-      return alert(
-        error.response?.data?.message ||
-          "Erro no servidor, tente novamente mais tarde."
-      );
+      console.log("error no check document: ", error);
+      Alert.alert("ERRO", "Erro no servidor, tente novamente mais tarde.");
+      return;
     }
   };
 
@@ -118,9 +170,9 @@ const LoginDocument = () => {
               placeholder={`Informe ${
                 params.type === "donation" ? "seu CPF" : "o CNPJ"
               }`}
-              value={cpfCnpjMask(document)}
-              onChangeText={(text) => setDocument(text)}
-              maxLength={params.type === "donation" ? 14 : 18}
+              value={cpfCnpjMask(document || "")}
+              onChangeText={(document) => setDocument(document)}
+              maxLength={params.type && params.type === "donation" ? 14 : 18}
               keyboardType="numeric"
               autoCorrect={false}
             />

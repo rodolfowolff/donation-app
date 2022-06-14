@@ -34,8 +34,6 @@ const Input: React.FC<InputProps & TextInputProps> = ({
   containerStyle,
   ...props
 }) => {
-  const { colors } = useTheme();
-
   return (
     <InputContainer style={containerStyle}>
       {leftIcon && (
