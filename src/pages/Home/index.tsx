@@ -9,8 +9,9 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useAuth } from "../../context/auth";
-import { useRegister } from "../../context/register";
+import useFetch from "../../hooks/useFetch";
 import { useTheme } from "styled-components";
+import { useNavigation } from "@react-navigation/native";
 
 import { Header, Typography, Input, Loading } from "../../components/common";
 import { Container } from "../../styles/global.style";
@@ -20,13 +21,13 @@ import CardOng from "../../components/common/CardOng";
 
 const Home = () => {
   const { setIsAuth, personalData } = useAuth();
+  const { data, error } = useFetch("/ongs/findall");
   const { colors } = useTheme();
+  const { navigate } = useNavigation();
 
   const [loading, setLoading] = useState(false);
 
-  const testeRender = () => <CardOng />;
-
-  console.log("personalData: ", personalData);
+  const renderOngs = ({ item }: any) => <CardOng ong={item} />;
 
   const handleLogout = async () => {
     setLoading(true);
@@ -40,9 +41,13 @@ const Home = () => {
     return;
   };
 
-  return loading ? (
-    <Loading />
-  ) : (
+  if (error) {
+    Alert.alert("Erro", "Não foi possível carregar as ONGs");
+  }
+
+  if (!data || loading) return <Loading />;
+
+  return (
     <Container>
       <StatusBar
         barStyle="dark-content"
@@ -96,11 +101,11 @@ const Home = () => {
           </Typography>
         </S.ContentHeaderHome>
         <FlatList
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          data={data || []}
           contentContainerStyle={{ paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.toString()}
-          renderItem={testeRender}
+          keyExtractor={(item) => item.id}
+          renderItem={renderOngs}
         />
       </S.ContentHome>
     </Container>

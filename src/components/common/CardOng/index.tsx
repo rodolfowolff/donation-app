@@ -8,7 +8,7 @@ import { Button } from "../Button";
 import Icon from "@expo/vector-icons/FontAwesome5";
 import { useTheme } from "styled-components";
 
-const CardOng = () => {
+const CardOng = ({ ong }: any) => {
   const { navigate } = useNavigation();
   const { colors } = useTheme();
 
@@ -24,7 +24,7 @@ const CardOng = () => {
         weight="bold"
         style={{ marginTop: 1 }}
       >
-        Nome da ONG
+        {ong?.name}
       </Typography>
       <Typography
         color="gray"
@@ -41,7 +41,7 @@ const CardOng = () => {
         txtColor="white"
         size="medium"
         weight="regular"
-        onPress={() => navigate("LoginPassword", { type: "donation" })}
+        onPress={() => navigate("OngDetails", { id: ong.id })}
       />
     </S.ContainerCard>
   );

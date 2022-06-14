@@ -12,6 +12,7 @@ import LoginPassword from "../pages/Login/LoginPassword";
 import RegisterPersonalData from "../pages/Register/RegisterPersonalData";
 import RegisterAddress from "../pages/Register/RegisterAddress";
 import RegisterPassword from "../pages/Register/RegisterPassword";
+import OngDetails from "../pages/OngDetails";
 import TabNavigator from "./TabNavigator";
 
 declare global {
@@ -24,6 +25,7 @@ declare global {
       RegisterPersonalData: { type: string };
       RegisterAddress: { type: string };
       RegisterPassword: { type: string };
+      OngDetails: { id: string };
       Index: {
         type: string;
         name: string;
@@ -78,7 +80,11 @@ const AppNavigator = () => {
         </Stack.Group>
       )}
       {!loading && isAuth && (
-        <Stack.Screen name="Index" component={TabNavigator} />
+        //@ts-ignore
+        <Stack.Group>
+          <Stack.Screen name="Index" component={TabNavigator} />
+          <Stack.Screen name="OngDetails" component={OngDetails} />
+        </Stack.Group>
       )}
     </Stack.Navigator>
   );

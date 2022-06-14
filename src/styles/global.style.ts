@@ -38,3 +38,16 @@ export const BgImage = styled.Image`
 export const IconImage = styled.Image.attrs({
   resizeMode: "contain",
 })``;
+
+export const Divider = styled.View`
+  width: 100%;
+  height: 1px;
+  background-color: ${({ theme }) => theme.colors.stroke};
+  margin: 15px 0;
+`;
+
+export const BottomButton = styled.View`
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: ${getBottomSpace() + 10}px;
+`;
