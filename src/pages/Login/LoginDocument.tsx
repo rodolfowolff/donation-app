@@ -67,8 +67,6 @@ const LoginDocument = () => {
     }
 
     const documentUnMasked = cpfCnpjUnmask(document || "");
-    console.log("documentUnMasked", documentUnMasked);
-
     if (!documentUnMasked) {
       Alert.alert(
         "Documento inválido",

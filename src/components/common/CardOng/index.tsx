@@ -56,4 +56,4 @@ const CardOng = ({ ong }: any) => {
   );
 };
 
-export default CardOng;
+export { CardOng };

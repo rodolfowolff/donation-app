@@ -13,15 +13,25 @@ import useFetch from "../../hooks/useFetch";
 import { useTheme } from "styled-components";
 import { useNavigation } from "@react-navigation/native";
 
-import { Header, Typography, Input, Loading } from "../../components/common";
+import {
+  Header,
+  Typography,
+  Input,
+  Loading,
+  CardOng,
+} from "../../components/common";
 import { Container } from "../../styles/global.style";
 import * as S from "./styles";
 import Icon from "@expo/vector-icons/FontAwesome5";
-import CardOng from "../../components/common/CardOng";
 
 const Home = () => {
   const { setIsAuth, personalData } = useAuth();
-  const { data, error } = useFetch("/ongs/findall");
+  const [search, setSearch] = useState("");
+  const { data, error } = useFetch(
+    search && search.length > 2
+      ? `/ongs/findall?name=${search}`
+      : "/ongs/findall"
+  );
   const { colors } = useTheme();
   const { navigate } = useNavigation();
 
@@ -86,14 +96,16 @@ const Home = () => {
             leftIconColor={colors.gray}
             placeholder="Buscar ONG"
             leftIconPress={() => {}}
-            containerStyle={{ borderWidth: 1, borderColor: colors.stroke }}
+            containerStyle={{
+              borderWidth: 1,
+              borderColor: colors.stroke,
+              marginBottom: 10,
+            }}
+            value={search}
+            onChangeText={(text) => setSearch(text)}
           />
           <FlatList
             data={data || []}
-            contentContainerStyle={{
-              paddingHorizontal: 3,
-              paddingVertical: 10,
-            }}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item.id}
             ListHeaderComponent={
@@ -103,9 +115,11 @@ const Home = () => {
                 weight="bold"
                 style={{ marginVertical: 7 }}
               >
-                {data.length === 0
-                  ? "Nenhuma ONG próximas foi encontrada"
-                  : "Ongs próximas a você:"}
+                {data.length > 0
+                  ? "Ongs próximas a você"
+                  : data.length === 0 && search.length > 2
+                  ? "Nenhuma ONG com esse nome foi encontrada"
+                  : "Nenhuma ONG próxima foi encontrada"}
               </Typography>
             }
             renderItem={renderOngs}
