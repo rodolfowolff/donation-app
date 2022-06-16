@@ -69,28 +69,32 @@ const OngDetails = () => {
         showsVerticalScrollIndicator={false}
       >
         <S.BannerContentImg>
-          <S.BannerImg source={ImageTeste} resizeMode="cover" />
+          <S.BannerImg
+            source={
+              data?.ongPersonalData?.banner
+                ? { uri: data?.ongPersonalData?.banner }
+                : ImageTeste
+            }
+            resizeMode="cover"
+          />
         </S.BannerContentImg>
-
-        <Typography
-          color="gray"
-          size="medium"
-          weight="bold"
-          style={{ marginTop: 10 }}
-        >
-          NOME
-        </Typography>
         <Typography
           color="black"
           size="large"
           weight="regular"
-          style={{ marginTop: 5 }}
+          style={{ marginTop: 10 }}
         >
           {data?.name || "Nome da ONG"}
         </Typography>
-
+        <Typography
+          color="gray"
+          size="medium"
+          weight="bold"
+          style={{ marginTop: 5 }}
+        >
+          {data?.donations.length} doações
+        </Typography>
         <Divider />
-
         <Typography color="gray" size="medium" weight="bold">
           EMAIL
         </Typography>
@@ -102,39 +106,22 @@ const OngDetails = () => {
         >
           {data?.ongPersonalData?.email || "Não informado"}
         </Typography>
-
         <Divider />
-
         <S.DescriptionContainer>
           <Typography color="gray" size="medium" weight="bold">
             DESCRIÇÃO
           </Typography>
           <Typography color="gray" size="medium" weight="regular">
-            Comentários (58)
+            Comentários ({data?.comments.length || 0})
           </Typography>
         </S.DescriptionContainer>
-
         <Typography
           color="black"
           size="large"
           weight="regular"
           style={{ marginBottom: 20 }}
         >
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos
-          ipsum perferendis, aut quasi assumenda dolorem recusandae
-          reprehenderit quas exercitationem quis. Officiis laudantium veritatis,
-          doloremque odit animi eius saepe dolorem ipsam? Lorem ipsum dolor sit
-          amet consectetur adipisicing elit. Dignissimos ipsum perferendis, aut
-          quasi assumenda dolorem recusandae reprehenderit quas exercitationem
-          quis. Officiis laudantium veritatis, doloremque odit animi eius saepe
-          dolorem ipsam? Lorem ipsum dolor sit amet consectetur adipisicing
-          elit. Dignissimos ipsum perferendis, aut quasi assumenda dolorem
-          recusandae reprehenderit quas exercitationem quis. Officiis laudantium
-          veritatis, doloremque odit animi eius saepe dolorem ipsam? Lorem ipsum
-          dolor sit amet consectetur adipisicing elit. Dignissimos ipsum
-          perferendis, aut quasi assumenda dolorem recusandae reprehenderit quas
-          exercitationem quis. Officiis laudantium veritatis, doloremque odit
-          animi eius saepe dolorem ipsam?
+          {data?.ongPersonalData?.description || "Não informado"}
         </Typography>
       </ScrollContent>
 

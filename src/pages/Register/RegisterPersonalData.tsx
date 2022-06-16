@@ -53,12 +53,11 @@ const RegisterPersonalData = () => {
         userPersonalData.email.length < 5 ||
         userPersonalData.email.length > 50 ||
         !userPersonalData.email.includes("@") ||
-        !userPersonalData.email.includes(".")
+        !userPersonalData.email.includes(".") ||
+        //@ts-ignore
+        !userPersonalData.match(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i)
       ) {
-        Alert.alert(
-          "Email inválido",
-          "O email deve ter entre 5 e 50 caracteres e conter @ e ."
-        );
+        Alert.alert("Email inválido", "Insira um email válido");
         return false;
       }
 
@@ -151,7 +150,6 @@ const RegisterPersonalData = () => {
       />
       <Header
         back
-        type={params.type}
         title={
           params.type === "donation"
             ? "Cadastro dados pessoais"
@@ -163,8 +161,8 @@ const RegisterPersonalData = () => {
         <Typography size="xlarge" weight="bold" style={{ textAlign: "center" }}>
           {`Não encontramos seu registro\n ${
             params.type === "donation"
-              ? `CPF: ${userPersonalData.document}`
-              : `CNPJ: ${ongPersonalData.document}`
+              ? `CPF: ${userPersonalData?.document || ""}`
+              : `CNPJ: ${ongPersonalData?.document || ""}`
           }`}
         </Typography>
 
@@ -246,11 +244,11 @@ const RegisterPersonalData = () => {
           keyboardType="numeric"
           autoCorrect={false}
           maxLength={15}
-          value={telephoneMask(
+          value={
             params.type === "donation"
-              ? userPersonalData?.telephone
-              : ongPersonalData?.telephone || ""
-          )}
+              ? telephoneMask(userPersonalData?.telephone || "")
+              : telephoneMask(ongPersonalData?.telephone || "")
+          }
           onChangeText={(telephone) => {
             params.type === "donation"
               ? setUserPersonalData({ ...userPersonalData, telephone })
@@ -268,7 +266,7 @@ const RegisterPersonalData = () => {
             }}
             keyboardType="numeric"
             autoCorrect={false}
-            maxLength={11}
+            maxLength={10}
             value={dateMask(userPersonalData?.birthDate || "")}
             onChangeText={(birthDate) =>
               setUserPersonalData({ ...userPersonalData, birthDate })

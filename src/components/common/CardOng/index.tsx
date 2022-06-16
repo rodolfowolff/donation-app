@@ -17,12 +17,20 @@ const CardOng = ({ ong }: any) => {
       <S.ButtonFavorite onPress={() => {}}>
         <Icon name="heart" size={22} color={colors.black} />
       </S.ButtonFavorite>
-      <S.ImageCard source={ImageTeste} resizeMode="cover" />
+
+      <S.ImageCard
+        source={
+          ong?.ongPersonalData?.banner
+            ? { uri: ong?.ongPersonalData?.banner }
+            : ImageTeste
+        }
+        resizeMode="cover"
+      />
       <Typography
         color="black"
         size="medium"
         weight="bold"
-        style={{ marginTop: 1 }}
+        style={{ marginTop: 2, marginHorizontal: 3 }}
       >
         {ong?.name}
       </Typography>
@@ -30,10 +38,11 @@ const CardOng = ({ ong }: any) => {
         color="gray"
         size="small"
         weight="regular"
-        style={{ marginBottom: 3 }}
+        style={{ marginBottom: 5, marginHorizontal: 3 }}
+        ellipsizeMode="tail"
+        numberOfLines={2}
       >
-        Descrição da ONG, descrição da ONG, descrição da ONG, descrição da ONG
-        descrição da ONG descrição da ONG...
+        {ong?.ongPersonalData?.description || "Não informado"}
       </Typography>
       <Button
         title="Ver mais"

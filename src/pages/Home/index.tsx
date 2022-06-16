@@ -37,8 +37,6 @@ const Home = () => {
 
     Alert.alert("Sucesso", "Você saiu com sucesso!");
     setLoading(false);
-
-    return;
   };
 
   if (error) {
@@ -90,23 +88,29 @@ const Home = () => {
             leftIconPress={() => {}}
             containerStyle={{ borderWidth: 1, borderColor: colors.stroke }}
           />
-
-          <Typography
-            color="primary"
-            size="medium"
-            weight="bold"
-            style={{ marginTop: 10 }}
-          >
-            Ongs próximas a você:
-          </Typography>
+          <FlatList
+            data={data || []}
+            contentContainerStyle={{
+              paddingHorizontal: 3,
+              paddingVertical: 10,
+            }}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            ListHeaderComponent={
+              <Typography
+                color="gray"
+                size="medium"
+                weight="bold"
+                style={{ marginVertical: 7 }}
+              >
+                {data.length === 0
+                  ? "Nenhuma ONG próximas foi encontrada"
+                  : "Ongs próximas a você:"}
+              </Typography>
+            }
+            renderItem={renderOngs}
+          />
         </S.ContentHeaderHome>
-        <FlatList
-          data={data || []}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={renderOngs}
-        />
       </S.ContentHome>
     </Container>
   );

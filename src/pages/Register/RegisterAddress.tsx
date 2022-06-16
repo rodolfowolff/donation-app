@@ -30,7 +30,6 @@ const RegisterAddress = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
     if (data) {
       setAddressData({
         ...addressData,
@@ -40,22 +39,12 @@ const RegisterAddress = () => {
         state: data.state,
       });
       setLoading(false);
-    } else {
-      console.log("error no cep: ", error);
-      setAddressData({
-        ...addressData,
-        zipCode: "",
-        street: "",
-        number: "",
-        complement: "",
-        neighborhood: "",
-        city: "",
-        state: "",
-      });
+    } else if (error) {
+      Alert.alert("CEP inválido", "O CEP informado não existe");
       setLoading(false);
-      Alert.alert("Erro", "Ocorreu um erro ao buscar o CEP, tente novamente");
     }
-  }, [data]);
+    // setLoading(true);
+  }, [data, error]);
 
   const verifyFields = () => {
     //
@@ -89,16 +78,16 @@ const RegisterAddress = () => {
     });
   };
 
-  return loading ? (
-    <Loading />
-  ) : (
+  if (loading) return <Loading />;
+
+  return (
     <Container style={{ backgroundColor: colors.bg }}>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
-      <Header back type={params.type} title="Cadastro de endereço" />
+      <Header back title="Cadastro de endereço" />
 
       <ScrollContent style={{ marginHorizontal: 16 }}>
         <Typography size="xlarge" weight="bold" style={{ textAlign: "center" }}>
