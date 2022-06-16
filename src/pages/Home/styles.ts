@@ -9,5 +9,5 @@ export const ContentHome = styled.View`
 `;
 
 export const ContentHeaderHome = styled.View`
-  margin-bottom: 2px;
+  margin-bottom: ${getStatusBarHeight(true) + 200}px;
 `;

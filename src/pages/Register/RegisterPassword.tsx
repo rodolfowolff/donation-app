@@ -147,7 +147,7 @@ const RegisterPassword = () => {
         backgroundColor="transparent"
         translucent
       />
-      <Header back type={params.type} title="Senha de acesso" />
+      <Header back title="Senha de acesso" />
 
       <ScrollContent style={{ marginHorizontal: 16 }}>
         <Typography size="xlarge" weight="bold" style={{ textAlign: "center" }}>

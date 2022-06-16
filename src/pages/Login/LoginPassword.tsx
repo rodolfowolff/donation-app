@@ -88,9 +88,9 @@ const LoginPassword = () => {
     }
   };
 
-  return loading ? (
-    <Loading />
-  ) : (
+  if (loading) return <Loading />;
+
+  return (
     <Container style={{ backgroundColor: colors.primary }}>
       <StatusBar
         backgroundColor="transparent"

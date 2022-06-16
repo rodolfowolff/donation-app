@@ -27,6 +27,7 @@ const LoginDocument = () => {
     setUserPersonalData,
     ongPersonalData,
     setOngPersonalData,
+    resetState,
   } = useRegister();
   const { colors } = useTheme();
   const { goBack, navigate } = useNavigation();
@@ -60,17 +61,18 @@ const LoginDocument = () => {
         });
       }
     } else {
+      resetState();
       Alert.alert("Usuário inválido", "Tipo de usuário inválido");
       return;
     }
 
-    const documentUnMasked = cpfCnpjUnmask(document);
-
+    const documentUnMasked = cpfCnpjUnmask(document || "");
     if (!documentUnMasked) {
       Alert.alert(
         "Documento inválido",
         "CPF/CNPJ inválido para tirar os caracteres especiais"
       );
+      resetState();
       return;
     }
 
@@ -100,10 +102,8 @@ const LoginDocument = () => {
         navigate("LoginPassword", {
           type: params.type,
         });
-
         return;
       }
-
       if (data.status === false) {
         console.log("data.error false: ", data);
         navigate("RegisterPersonalData", {
@@ -112,19 +112,21 @@ const LoginDocument = () => {
         return;
       } else {
         console.log("data.error: ", data);
+        resetState();
         Alert.alert("Erro", "Erro ao verificar documento");
         return;
       }
     } catch (error: any) {
       console.log("error no check document: ", error);
+      resetState();
       Alert.alert("ERRO", "Erro no servidor, tente novamente mais tarde.");
       return;
     }
   };
 
-  return loading ? (
-    <Loading />
-  ) : (
+  if (loading) return <Loading />;
+
+  return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
