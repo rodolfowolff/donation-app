@@ -138,10 +138,10 @@ const RegisterPassword = () => {
     }
   };
 
-  return loading ? (
-    <Loading />
-  ) : (
-    <Container style={{ backgroundColor: colors.bg }}>
+  if (loading) return <Loading />;
+
+  return (
+    <Container>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"

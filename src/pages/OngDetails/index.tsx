@@ -26,7 +26,7 @@ const OngDetails = () => {
   const { api, loading } = useGeneralContext();
   const { mutate } = useSWRConfig();
   const { colors } = useTheme();
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [comment, setComment] = useState("");
@@ -138,7 +138,10 @@ const OngDetails = () => {
               weight="bold"
               style={{ marginTop: 5 }}
             >
-              {data?.donations.length} doações
+              {data?.donations.length}{" "}
+              {data?.donations.length > 1
+                ? "doações recebidas"
+                : "doação recebida"}
             </Typography>
             <Divider />
             <Typography color="gray" size="medium" weight="bold">
@@ -211,7 +214,7 @@ const OngDetails = () => {
           title="Doar agora"
           txtColor="white"
           size="large"
-          onPress={() => Alert.alert("doar", "chamar função doar")}
+          onPress={() => navigate("OngDonation", { ongId: params.id })}
         />
       </BottomButton>
     </Container>

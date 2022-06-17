@@ -81,7 +81,7 @@ const RegisterAddress = () => {
   if (loading) return <Loading />;
 
   return (
-    <Container style={{ backgroundColor: colors.bg }}>
+    <Container>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"

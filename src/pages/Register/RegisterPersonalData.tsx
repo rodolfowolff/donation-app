@@ -49,13 +49,15 @@ const RegisterPersonalData = () => {
         return false;
       }
 
+      console.log("userPersonalData", userPersonalData.email);
+
       if (
         userPersonalData.email.length < 5 ||
         userPersonalData.email.length > 50 ||
         !userPersonalData.email.includes("@") ||
-        !userPersonalData.email.includes(".") ||
+        !userPersonalData.email.includes(".")
         //@ts-ignore
-        !userPersonalData.match(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i)
+        // !userPersonalData.match(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i)
       ) {
         Alert.alert("Email inválido", "Insira um email válido");
         return false;
@@ -139,10 +141,10 @@ const RegisterPersonalData = () => {
     return;
   };
 
-  return loading ? (
-    <Loading />
-  ) : (
-    <Container style={{ backgroundColor: colors.bg }}>
+  if (loading) return <Loading />;
+
+  return (
+    <Container>
       <StatusBar
         barStyle="dark-content"
         backgroundColor="transparent"

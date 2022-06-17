@@ -33,7 +33,7 @@ const Home = () => {
       : "/ongs/findall"
   );
   const { colors } = useTheme();
-  const { navigate } = useNavigation();
+  const { goBack } = useNavigation();
 
   const [loading, setLoading] = useState(false);
 
@@ -50,7 +50,9 @@ const Home = () => {
   };
 
   if (error) {
-    Alert.alert("Erro", "Não foi possível carregar as ONGs");
+    Alert.alert("Erro", "Não foi possível carregar os dados", [
+      { text: "OK", onPress: () => goBack() },
+    ]);
   }
 
   if (!data || loading) return <Loading />;
