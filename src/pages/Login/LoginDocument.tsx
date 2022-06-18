@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { cpfCnpjUnmask, cpfCnpjMask } from "js-essentials-functions";
+import { verifyDocument } from "../../utils/verifyInput";
 
 import { useGeneralContext } from "../../context/general";
 import { useRegister } from "../../context/register";
@@ -33,33 +34,23 @@ const LoginDocument = () => {
   const { goBack, navigate } = useNavigation();
 
   const [document, setDocument] = useState("");
+  const [validDocument, setValidDocument] = useState(false);
 
   const handleCheckDocument = async () => {
-    if (document === "" || document === undefined || document === null) {
-      Alert.alert("CPF/CNPJ inválido", "CPF/CNPJ não pode ser vazio");
-      return;
-    }
-
     if (params.type === "donation") {
-      if (document.length !== 14) {
-        Alert.alert("CPF inválido", "CPF deve ter 11 caracteres");
-        return;
-      } else {
-        setUserPersonalData({
-          ...userPersonalData,
-          document: document,
-        });
+      if (!verifyDocument(document, 14, "donation")) {
+        Alert.alert("CPF inválido", "CPF não está no formato correto");
+        return false;
       }
+
+      setUserPersonalData({ ...userPersonalData, document: document });
     } else if (params.type === "ong") {
-      if (document.length !== 17) {
-        Alert.alert("CNPJ inválido", "CNPJ deve ter 14 caracteres");
-        return;
-      } else {
-        setOngPersonalData({
-          ...ongPersonalData,
-          document: document,
-        });
+      if (!verifyDocument(document, 17, "ong")) {
+        Alert.alert("CNPJ inválido", "CNPJ não está no formato correto");
+        return false;
       }
+
+      setOngPersonalData({ ...ongPersonalData, document: document });
     } else {
       resetState();
       Alert.alert("Usuário inválido", "Tipo de usuário inválido");
@@ -166,20 +157,34 @@ const LoginDocument = () => {
                 params.type === "donation" ? "seu CPF" : "o CNPJ"
               }`}
               value={cpfCnpjMask(document || "")}
-              onChangeText={(document) => setDocument(document)}
+              onChangeText={(document) => {
+                setDocument(document);
+                const isValid = verifyDocument(
+                  document,
+                  params.type && params.type === "donation" ? 14 : 18,
+                  params.type
+                );
+                isValid ? setValidDocument(true) : setValidDocument(false);
+              }}
               maxLength={params.type && params.type === "donation" ? 14 : 18}
               keyboardType="numeric"
               autoCorrect={false}
             />
+            {/* {!validDocument ? (
+              <Typography color="danger" size="medium" weight="regular">
+                {params.type === "donation" ? "CPF inválido" : "CNPJ inválido"}
+              </Typography>
+            ) : null} */}
           </View>
 
           <Button
             title="Continuar"
-            bgColor="white"
             txtColor="primary"
+            bgColor={!validDocument ? "gray" : "white"}
             size="large"
             weight="bold"
             margin={30}
+            disabled={!validDocument}
             onPress={() => handleCheckDocument()}
           />
         </Content>

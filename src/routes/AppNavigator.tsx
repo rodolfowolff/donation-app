@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -16,7 +17,7 @@ import RegisterAddress from "../pages/Register/RegisterAddress";
 import RegisterPassword from "../pages/Register/RegisterPassword";
 import ChangePassword from "../pages/Profile/ChangePassword";
 
-import TabNavigator from "./TabNavigator";
+import { BottomNav } from "./TabNavigator";
 import OngDetails from "../pages/OngDetails";
 import OngDonation from "../pages/OngDonation";
 
@@ -69,7 +70,7 @@ const AppNavigator = () => {
     //@ts-ignore
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {loading && <Stack.Screen name="Loading" component={Loading} />}
-      {!loading && !isAuth && (
+      {!isAuth ? (
         //@ts-ignore
         <Stack.Group>
           <Stack.Screen name="Onboarding" component={Onboarding} />
@@ -82,11 +83,10 @@ const AppNavigator = () => {
           <Stack.Screen name="RegisterAddress" component={RegisterAddress} />
           <Stack.Screen name="RegisterPassword" component={RegisterPassword} />
         </Stack.Group>
-      )}
-      {!loading && isAuth && (
+      ) : (
         //@ts-ignore
         <Stack.Group>
-          <Stack.Screen name="Index" component={TabNavigator} />
+          <Stack.Screen name="Index" component={BottomNav} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
           <Stack.Screen name="OngDetails" component={OngDetails} />
           <Stack.Screen name="OngDonation" component={OngDonation} />

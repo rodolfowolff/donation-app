@@ -28,7 +28,7 @@ const RegisterPassword = () => {
     addressData,
     resetState,
   } = useRegister();
-  const { navigate } = useNavigation();
+  const { navigate, reset } = useNavigation();
   const { colors } = useTheme();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -119,6 +119,7 @@ const RegisterPassword = () => {
         );
 
         resetState();
+        setConfirmPassword("");
 
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
 

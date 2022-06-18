@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { StatusBar, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
+
 import { telephoneMask, dateMask } from "js-essentials-functions";
+import {
+  verifyName,
+  verifyEmail,
+  verifyPhoneNumber,
+  verifyDate,
+  verifyGeneralText,
+} from "../../utils/verifyInput";
 
 import { useRegister } from "../../context/register";
 
@@ -30,18 +38,28 @@ const RegisterPersonalData = () => {
 
   const verifyFields = () => {
     if (params.type === "donation") {
+      const { firstName, lastName, email, telephone, birthDate } =
+        userPersonalData;
       if (
-        userPersonalData.firstName.length < 3 ||
-        userPersonalData.firstName.length > 20
+        firstName === undefined ||
+        lastName === undefined ||
+        email === undefined ||
+        telephone === undefined ||
+        birthDate === undefined
       ) {
+        Alert.alert(
+          "Campos vazios",
+          "Preencha todos os campos antes de continuar."
+        );
+        return false;
+      }
+
+      if (!verifyName(firstName)) {
         Alert.alert("Nome inválido", "O nome deve ter entre 3 e 20 caracteres");
         return false;
       }
 
-      if (
-        userPersonalData.lastName.length < 3 ||
-        userPersonalData.lastName.length > 20
-      ) {
+      if (!verifyName(lastName)) {
         Alert.alert(
           "Sobrenome inválido",
           "O sobrenome deve ter entre 3 e 20 caracteres"
@@ -49,72 +67,50 @@ const RegisterPersonalData = () => {
         return false;
       }
 
-      console.log("userPersonalData", userPersonalData.email);
-
-      if (
-        userPersonalData.email.length < 5 ||
-        userPersonalData.email.length > 50 ||
-        !userPersonalData.email.includes("@") ||
-        !userPersonalData.email.includes(".")
-        //@ts-ignore
-        // !userPersonalData.match(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i)
-      ) {
+      if (!verifyEmail(email)) {
         Alert.alert("Email inválido", "Insira um email válido");
         return false;
       }
 
-      if (
-        userPersonalData.telephone.length < 14 ||
-        userPersonalData.telephone.length > 15
-      ) {
+      if (!verifyPhoneNumber(telephone)) {
         Alert.alert(
           "Telefone inválido",
-          "O Telefone deve ter entre 10 ou 11 caracteres, incluindo o DDD"
+          "Insira um telefone válido, incluindo o DDD"
         );
         return false;
       }
 
-      if (userPersonalData.birthDate.length !== 10) {
+      if (!verifyDate(birthDate)) {
         Alert.alert(
           "Data de nascimento inválida",
-          "A data de nascimento deve ter 10 caracteres, no formato dia/mes/ano"
+          "Informe uma data válida no formato dia/mes/ano"
         );
         return false;
       }
     } else if (params.type === "ong") {
-      if (ongPersonalData.name.length < 3 || ongPersonalData.name.length > 20) {
+      const { name, email, telephone, description } = ongPersonalData;
+      if (!verifyName(name)) {
         Alert.alert("Nome inválido", "O nome deve ter entre 3 e 20 caracteres");
         return false;
       }
 
-      if (
-        ongPersonalData.email.length < 5 ||
-        ongPersonalData.email.length > 50 ||
-        !ongPersonalData.email.includes("@") ||
-        !ongPersonalData.email.includes(".")
-      ) {
-        Alert.alert(
-          "Email inválido",
-          "O email deve ter entre 5 e 50 caracteres e conter @ e ."
-        );
+      if (!verifyEmail(email)) {
+        Alert.alert("Email inválido", "Insira um email válido");
         return false;
       }
 
-      if (
-        ongPersonalData.telephone.length < 14 ||
-        ongPersonalData.telephone.length > 15
-      ) {
+      if (!verifyPhoneNumber(telephone)) {
         Alert.alert(
           "Telefone inválido",
-          "O Telefone deve ter entre 10 ou 11 caracteres, incluindo o DDD"
+          "Insira um telefone válido, incluindo o DDD"
         );
         return false;
       }
 
-      if (ongPersonalData.description.length < 10) {
+      if (!verifyGeneralText(description, 10, 50)) {
         Alert.alert(
           "Descrição inválida",
-          "A descrição deve ter no mínimo 10 caracteres"
+          "A descrição deve ter no mínimo 10 caracteres e no máximo 50"
         );
         return false;
       }
@@ -129,12 +125,13 @@ const RegisterPersonalData = () => {
     setLoading(true);
     const verify = verifyFields();
 
-    if (!verify) {
+    if (verify === false) {
       setLoading(false);
       return;
     }
 
     setLoading(false);
+
     navigate("RegisterAddress", {
       type: params.type,
     });

@@ -1,5 +1,6 @@
 import React from "react";
 import { Text } from "react-native";
+import dateFormat from "../../../utils/formatDate";
 import { Typography } from "../Text";
 
 import * as S from "./styles";
@@ -15,10 +16,7 @@ interface CardCommentsProps {
 }
 
 const CardComments: React.FC<CardCommentsProps> = ({ data }) => {
-  const dateComment: any = new Date(data?.createdAt);
-  const dateFormatted = `${dateComment.getDate()}/${
-    dateComment.getMonth() + 1
-  }/${dateComment.getFullYear()}`;
+  const dateFormatted = dateFormat(data?.createdAt);
 
   return (
     <S.CardCommentsContent>

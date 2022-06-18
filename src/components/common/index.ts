@@ -5,3 +5,4 @@ export * from "./Header";
 export * from "./CardOng";
 export * from "./Loading";
 export * from "./CardComments";
+export * from "./CardHistoryDonate";

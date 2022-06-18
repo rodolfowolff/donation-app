@@ -72,4 +72,6 @@ const TabNavigator = () => {
   );
 };
 
-export default TabNavigator;
+export function BottomNav() {
+  return <TabNavigator />;
+}

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
+
 import { cepMask, cepUnmask } from "js-essentials-functions";
+import { validadeZipCode } from "../../utils/verifyInput";
 
 import { useRegister } from "../../context/register";
 
@@ -27,6 +29,8 @@ const RegisterAddress = () => {
       ? `/zipcode/${cepUnmask(addressData.zipCode)}`
       : null
   );
+
+  const [validZipCode, setValidZipCode] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -38,36 +42,45 @@ const RegisterAddress = () => {
         city: data.city,
         state: data.state,
       });
-      setLoading(false);
-    } else if (error) {
-      Alert.alert("CEP inválido", "O CEP informado não existe");
-      setLoading(false);
     }
-    // setLoading(true);
+    if (error) {
+      Alert.alert("CEP inválido", "O CEP informado não existe");
+      setAddressData({
+        ...addressData,
+        zipCode: "",
+        street: "",
+        neighborhood: "",
+        city: "",
+        state: "",
+      });
+    }
   }, [data, error]);
 
   const verifyFields = () => {
-    //
-    // fazer verificação de campos
-    //
-    if (
-      addressData.zipCode.length === 9 &&
-      addressData.street.length > 3 &&
-      addressData.number.length > 0 &&
-      addressData.neighborhood.length > 3 &&
-      addressData.city.length > 3 &&
-      addressData.state.length === 2
-    ) {
-      return true;
+    const { street, number, complement, zipCode } = addressData;
+    if (!validadeZipCode(zipCode)) {
+      Alert.alert("CEP inválido", "O CEP informado não existe");
+      return false;
     }
-    Alert.alert("Preencha todos os campos corretamente");
-    return false;
+    // if (
+    //   addressData.zipCode.length === 9 &&
+    //   addressData.street.length > 3 &&
+    //   addressData.number.length > 0 &&
+    //   addressData.neighborhood.length > 3 &&
+    //   addressData.city.length > 3 &&
+    //   addressData.state.length === 2
+    // ) {
+    //   return true;
+    // }
+    // Alert.alert("Preencha todos os campos corretamente");
+    return true;
   };
 
   const handleRegisterAddress = () => {
     setLoading(true);
     const verify = verifyFields();
-    if (!verify) {
+
+    if (verify === false) {
       setLoading(false);
       return;
     }
@@ -113,9 +126,11 @@ const RegisterAddress = () => {
           autoCorrect={false}
           maxLength={9}
           keyboardType="numeric"
-          onChangeText={(zipCode) =>
-            setAddressData({ ...addressData, zipCode: cepMask(zipCode) })
-          }
+          onChangeText={(zipCode) => {
+            setAddressData({ ...addressData, zipCode: cepMask(zipCode) });
+            const isValid = validadeZipCode(zipCode);
+            isValid ? setValidZipCode(true) : setValidZipCode(false);
+          }}
           value={cepMask(addressData?.zipCode || "")}
         />
 
@@ -215,7 +230,9 @@ const RegisterAddress = () => {
           <Button
             title="Continuar"
             txtColor="white"
+            bgColor={!validZipCode ? "gray" : "primary"}
             margin={5}
+            disabled={addressData?.zipCode?.length !== 9}
             onPress={() => {
               handleRegisterAddress();
             }}
