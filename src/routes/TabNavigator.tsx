@@ -29,7 +29,7 @@ const TabNavigator = () => {
               //@ts-ignore
               <AntDesign
                 name="home"
-                size={focused ? 30 : 25}
+                size={focused ? 27 : 22}
                 color={focused ? colors.primary : colors.gray}
               />
             );
@@ -38,7 +38,7 @@ const TabNavigator = () => {
               //@ts-ignore
               <AntDesign
                 name="hearto"
-                size={focused ? 30 : 25}
+                size={focused ? 27 : 22}
                 color={focused ? colors.primary : colors.gray}
               />
             );
@@ -47,7 +47,7 @@ const TabNavigator = () => {
               //@ts-ignore
               <AntDesign
                 name="filetext1"
-                size={focused ? 30 : 25}
+                size={focused ? 27 : 22}
                 color={focused ? colors.primary : colors.gray}
               />
             );
@@ -56,7 +56,7 @@ const TabNavigator = () => {
               //@ts-ignore
               <AntDesign
                 name="user"
-                size={focused ? 30 : 25}
+                size={focused ? 27 : 22}
                 color={focused ? colors.primary : colors.gray}
               />
             );
@@ -72,6 +72,4 @@ const TabNavigator = () => {
   );
 };
 
-export function BottomNav() {
-  return <TabNavigator />;
-}
+export default TabNavigator;

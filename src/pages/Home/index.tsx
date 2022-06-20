@@ -1,24 +1,17 @@
-import React, { useState } from "react";
-import {
-  Alert,
-  FlatList,
-  StatusBar,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, FlatList, StatusBar, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useAuth } from "../../context/auth";
 import useFetch from "../../hooks/useFetch";
 import { useTheme } from "styled-components";
-import { useNavigation } from "@react-navigation/native";
 
 import {
   Header,
   Typography,
   Input,
-  Loading,
   CardOng,
+  Skeleton,
 } from "../../components/common";
 import { Container } from "../../styles/global.style";
 import * as S from "./styles";
@@ -33,29 +26,31 @@ const Home = () => {
       : "/ongs/findall"
   );
   const { colors } = useTheme();
-  const { goBack } = useNavigation();
 
-  const [loading, setLoading] = useState(false);
-
-  const renderOngs = ({ item }: any) => <CardOng ong={item} />;
+  const [ongs, setOngs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleLogout = async () => {
-    setLoading(true);
-
-    await AsyncStorage.clear();
     setIsAuth(false);
-
-    Alert.alert("Sucesso", "Você saiu com sucesso!");
-    setLoading(false);
+    await AsyncStorage.clear();
   };
 
   if (error) {
     Alert.alert("Erro", "Não foi possível carregar os dados", [
-      { text: "OK", onPress: () => goBack() },
+      { text: "OK", onPress: () => handleLogout() },
     ]);
   }
 
-  if (!data || loading) return <Loading />;
+  useEffect(() => {
+    setLoading(true);
+
+    if (!error && !!data) {
+      setOngs(data);
+      setLoading(false);
+    }
+  }, [data]);
+
+  const renderOngs = ({ item }: any) => <CardOng ong={item} />;
 
   return (
     <Container>
@@ -70,12 +65,10 @@ const Home = () => {
             <View>
               <Typography color="black" size="xlarge" weight="bold">
                 Olá,{" "}
-                {personalData.firstName
-                  ? personalData.firstName
-                  : personalData.name}
+                {personalData?.firstName ? personalData?.firstName : "Usuário"}
               </Typography>
               <Typography color="gray" size="medium" weight="regular">
-                {personalData.firstName
+                {personalData?.firstName
                   ? "Encontre ONGs que precisam de sua ajuda."
                   : "Seja bem-vindo(a) ao app."}
               </Typography>
@@ -83,12 +76,6 @@ const Home = () => {
           }
           rightComponent={<Icon name="bell" size={24} color={colors.black} />}
         />
-
-        <TouchableOpacity onPress={() => handleLogout()}>
-          <Typography color="black" size="xlarge" weight="bold">
-            Deslogar teste
-          </Typography>
-        </TouchableOpacity>
 
         <S.ContentHeaderHome>
           <Input
@@ -106,26 +93,55 @@ const Home = () => {
             value={search}
             onChangeText={(text) => setSearch(text)}
           />
-          <FlatList
-            data={data || []}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            ListHeaderComponent={
+
+          {loading ? (
+            <>
               <Typography
                 color="gray"
                 size="medium"
                 weight="bold"
                 style={{ marginVertical: 7 }}
               >
-                {data.length > 0
-                  ? "Ongs próximas a você"
-                  : data.length === 0 && search.length > 2
-                  ? "Nenhuma ONG com esse nome foi encontrada"
-                  : "Nenhuma ONG próxima foi encontrada"}
+                Carregando...
               </Typography>
-            }
-            renderItem={renderOngs}
-          />
+              {[0, 1].map((item) => (
+                <View key={item}>
+                  <Skeleton
+                    key={item}
+                    width={"100%"}
+                    height={230}
+                    color="gray"
+                    variant="card"
+                    borderRadius={10}
+                    marginTop={2}
+                    marginLeft={0}
+                    marginRight={0}
+                  />
+                </View>
+              ))}
+            </>
+          ) : (
+            <FlatList
+              data={data || []}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              ListHeaderComponent={
+                <Typography
+                  color="gray"
+                  size="medium"
+                  weight="bold"
+                  style={{ marginVertical: 7 }}
+                >
+                  {data.length > 0
+                    ? "Ongs próximas a você"
+                    : data.length === 0 && search.length > 2
+                    ? "Nenhuma ONG com esse nome foi encontrada"
+                    : "Nenhuma ONG próxima foi encontrada"}
+                </Typography>
+              }
+              renderItem={renderOngs}
+            />
+          )}
         </S.ContentHeaderHome>
       </S.ContentHome>
     </Container>

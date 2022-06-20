@@ -34,7 +34,7 @@ const RegisterAddress = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (data) {
+    if (!error && !!data) {
       setAddressData({
         ...addressData,
         street: data.street,
@@ -43,6 +43,7 @@ const RegisterAddress = () => {
         state: data.state,
       });
     }
+
     if (error) {
       Alert.alert("CEP inválido", "O CEP informado não existe");
       setAddressData({

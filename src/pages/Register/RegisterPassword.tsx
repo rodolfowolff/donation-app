@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar, Alert } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useGeneralContext } from "../../context/general";
@@ -16,6 +16,7 @@ import {
 } from "../../components/common";
 import { Container, ScrollContent } from "../../styles/global.style";
 import * as S from "./styles";
+import { useAuth } from "../../context/auth";
 
 const RegisterPassword = () => {
   const { params }: any = useRoute();
@@ -28,7 +29,7 @@ const RegisterPassword = () => {
     addressData,
     resetState,
   } = useRegister();
-  const { navigate, reset } = useNavigation();
+  const { setIsAuth, setPersonalData } = useAuth();
   const { colors } = useTheme();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -118,16 +119,17 @@ const RegisterPassword = () => {
             : JSON.stringify(data.ong)
         );
 
-        resetState();
-        setConfirmPassword("");
-
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
 
-        navigate("Index", {
-          type: params.type,
-          name: params.type === "donation" ? data.user : data.ong,
-          token: data.token,
-        });
+        setIsAuth(true);
+        console.log(
+          "verificar o que vem no data para passar para o setPersonalData: ",
+          data
+        );
+        setPersonalData(params.type === "donation" ? data.user : data.ong);
+
+        resetState();
+        setConfirmPassword("");
       }
     } catch (error: any) {
       console.log("error na page password: ", error.response);

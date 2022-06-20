@@ -22,7 +22,7 @@ const CardComments: React.FC<CardCommentsProps> = ({ data }) => {
     <S.CardCommentsContent>
       <S.CardCommentsHeader>
         <Typography color="gray" size="medium" weight="regular">
-          {data?.user?.firstName}
+          {data?.user?.firstName || "Usuário"}
         </Typography>
         <Typography color="gray" size="medium" weight="regular">
           {dateFormatted || "Não informado"}

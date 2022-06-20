@@ -1,57 +1,88 @@
 import React, { useEffect, useState } from "react";
-import { Alert, StatusBar, TouchableOpacity } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StatusBar,
+  TouchableOpacity,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "styled-components/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useAuth } from "../../context/auth";
 import useFetch, { useSWRConfig } from "../../hooks/useFetch";
 import { useGeneralContext } from "../../context/general";
-import {
-  cpfCnpjMask,
-  telephoneMask,
-  telephoneUnmask,
-} from "js-essentials-functions";
+import { cpfCnpjMask, telephoneMask } from "js-essentials-functions";
 
+import { useTheme } from "styled-components/native";
+import { AntDesign } from "@expo/vector-icons";
 import {
   Button,
   Header,
   Input,
   Loading,
+  Skeleton,
   Typography,
 } from "../../components/common";
 import { BottomButton, Container } from "../../styles/global.style";
 import * as S from "./styles";
 
 const Profile = () => {
-  const { personalData, setPersonalData } = useAuth();
+  const { personalData, setPersonalData, setIsAuth } = useAuth();
   const { colors } = useTheme();
-  const { goBack, navigate } = useNavigation();
+  const { reset, goBack, navigate } = useNavigation();
   const { data, error } = useFetch(`/users/${personalData.id}`);
-  const { api, loading } = useGeneralContext();
+  const { api } = useGeneralContext();
   const { mutate } = useSWRConfig();
 
-  const [loadingLocal, setLoadingLocal] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingLogout, setLoadingLogout] = useState(false);
 
   if (error) {
-    Alert.alert("Erro", "Não foi possível carregar os dados", [
-      { text: "OK", onPress: () => goBack() },
+    console.log("error", error);
+    Alert.alert("Erro", "Erro ao carregar seu perfil", [
+      {
+        text: "OK",
+        onPress: () => reset({ index: 0, routes: [{ name: "Index" }] }),
+      },
     ]);
   }
 
   useEffect(() => {
-    if (data) {
-      setLoadingLocal(true);
+    setLoadingUser(true);
+    if (!error && !!data) {
       setPersonalData({ ...personalData, ...data });
-      setLoadingLocal(false);
+      setLoadingUser(false);
     }
   }, [data]);
 
+  useEffect(() => {
+    if (loadingLogout) {
+      setTimeout(async () => {
+        setIsAuth(false);
+      }, 1000);
+
+      return () => {
+        clearTimeout(1000);
+      };
+    }
+  }, [loadingLogout]);
+
+  const handleLogout = async () => {
+    setLoadingLogout(true);
+    await AsyncStorage.clear();
+
+    setTimeout(() => {
+      setLoadingLogout(false);
+    }, 1000);
+  };
+
   const handleEditUser = async () => {
-    setLoadingLocal(true);
+    setLoadingUser(true);
 
     if (personalData.userPersonalData.email.length === 0) {
       Alert.alert("Erro", "O campo e-mail não pode estar vazio");
-      setLoadingLocal(false);
+      setLoadingUser(false);
       return;
     }
 
@@ -60,13 +91,13 @@ const Profile = () => {
       personalData.userPersonalData.email.length > 40
     ) {
       Alert.alert("Erro", "O campo e-mail deve ter entre 5 e 40 caracteres");
-      setLoadingLocal(false);
+      setLoadingUser(false);
       return;
     }
 
     if (personalData.userPersonalData.telephone.length === 0) {
       Alert.alert("Erro", "O campo e-mail não pode estar vazio");
-      setLoadingLocal(false);
+      setLoadingUser(false);
       return;
     }
 
@@ -76,12 +107,12 @@ const Profile = () => {
       !telephoneMask(personalData.userPersonalData.telephone || "")
     ) {
       Alert.alert("Erro", "O campo nome não pode estar vazio");
-      setLoadingLocal(false);
+      setLoadingUser(false);
       return;
     }
 
     try {
-      setLoadingLocal(true);
+      setLoadingUser(true);
       const { data: dataApi } = await api({
         entity: "user",
         action: "updateUser",
@@ -112,17 +143,16 @@ const Profile = () => {
       }
     } catch (error: any) {
       console.log("error no update user: ", error);
-      setLoadingLocal(false);
       Alert.alert("Erro", "Não foi possível atualizar os dados", [
         { text: "OK", onPress: () => goBack() },
       ]);
       return;
     } finally {
-      setLoadingLocal(false);
+      setLoadingUser(false);
     }
   };
 
-  if (!data || loading || loadingLocal) return <Loading />;
+  if (loadingLogout) return <Loading />;
 
   return (
     <Container>
@@ -131,106 +161,148 @@ const Profile = () => {
         backgroundColor="transparent"
         translucent
       />
-      <Header back title="PERFIL DO USUARIO" />
+      <Header
+        back
+        title="PERFIL DO USUARIO"
+        rightComponent={
+          <Pressable onPress={() => handleLogout()}>
+            {/* @ts-ignore */}
+            <AntDesign name="logout" size={31} color={colors.danger} />
+          </Pressable>
+        }
+      />
 
-      <S.ChangePasswordContent>
-        <Typography
-          size="xxlarge"
-          weight="bold"
-          style={{ textAlign: "center", marginBottom: 20 }}
-        >
-          {personalData?.firstName && personalData?.lastName
-            ? `${personalData?.firstName} ${personalData?.lastName}`
-            : ""}
-        </Typography>
+      {loadingUser ? (
+        <>
+          <Skeleton
+            width="50%"
+            height={30}
+            color="gray"
+            variant="card"
+            marginLeft={100}
+            borderRadius={5}
+            marginBottom={20}
+          />
 
-        <Input
-          placeholder={"email@email.com"}
-          containerStyle={{
-            borderWidth: 1,
-            borderColor: colors.stroke,
-            marginBottom: 9,
-          }}
-          autoCorrect={false}
-          maxLength={40}
-          keyboardType="email-address"
-          value={personalData?.userPersonalData?.email || ""}
-          onChangeText={(email) =>
-            setPersonalData({
-              ...personalData,
-              userPersonalData: { ...personalData.userPersonalData, email },
-            })
-          }
-        />
+          {[0, 1, 2, 3].map((item) => (
+            <Skeleton
+              key={item}
+              width="90%"
+              height={50}
+              color="gray"
+              variant="card"
+              borderRadius={10}
+              marginTop={10}
+            />
+          ))}
+        </>
+      ) : (
+        <>
+          <S.ChangePasswordContent>
+            <Typography
+              size="xxlarge"
+              weight="bold"
+              style={{ textAlign: "center", marginBottom: 20 }}
+            >
+              {personalData?.firstName && personalData?.lastName
+                ? `${personalData?.firstName} ${personalData?.lastName}`
+                : "Usuário"}
+            </Typography>
 
-        <Input
-          rightIcon
-          containerStyle={{
-            borderWidth: 1,
-            borderColor: colors.stroke,
-            marginBottom: 9,
-          }}
-          rightIconName="lock"
-          rightIconColor={colors.gray}
-          editable={false}
-          placeholderTextColor={colors.gray}
-          placeholder={cpfCnpjMask(personalData?.document || "") || ""}
-        />
+            <Input
+              placeholder={"email@email.com"}
+              containerStyle={{
+                borderWidth: 1,
+                borderColor: colors.stroke,
+                marginBottom: 9,
+              }}
+              autoCorrect={false}
+              maxLength={40}
+              keyboardType="email-address"
+              value={personalData?.userPersonalData?.email || ""}
+              onChangeText={(email) =>
+                setPersonalData({
+                  ...personalData,
+                  userPersonalData: { ...personalData.userPersonalData, email },
+                })
+              }
+            />
 
-        <Input
-          rightIcon
-          containerStyle={{
-            borderWidth: 1,
-            borderColor: colors.stroke,
-            marginBottom: 9,
-          }}
-          placeholderTextColor={colors.gray}
-          placeholder="(00) 00000-0000"
-          autoCorrect={false}
-          maxLength={15}
-          keyboardType="phone-pad"
-          value={
-            telephoneMask(personalData?.userPersonalData?.telephone || "") || ""
-          }
-          onChangeText={(telephone) =>
-            setPersonalData({
-              ...personalData,
-              userPersonalData: { ...personalData.userPersonalData, telephone },
-            })
-          }
-        />
+            <Input
+              rightIcon
+              containerStyle={{
+                borderWidth: 1,
+                borderColor: colors.stroke,
+                marginBottom: 9,
+              }}
+              rightIconName="lock"
+              rightIconColor={colors.gray}
+              editable={false}
+              placeholderTextColor={colors.gray}
+              placeholder={cpfCnpjMask(personalData?.document || "") || ""}
+            />
 
-        <Input
-          rightIcon
-          containerStyle={{
-            borderWidth: 1,
-            borderColor: colors.stroke,
-            marginBottom: 9,
-          }}
-          rightIconName="lock"
-          rightIconColor={colors.gray}
-          editable={false}
-          placeholderTextColor={colors.gray}
-          placeholder={personalData?.userPersonalData?.birthDate || ""}
-        />
-      </S.ChangePasswordContent>
+            <Input
+              rightIcon
+              containerStyle={{
+                borderWidth: 1,
+                borderColor: colors.stroke,
+                marginBottom: 9,
+              }}
+              placeholderTextColor={colors.gray}
+              placeholder="(00) 00000-0000"
+              autoCorrect={false}
+              maxLength={15}
+              keyboardType="phone-pad"
+              value={
+                telephoneMask(
+                  personalData?.userPersonalData?.telephone || ""
+                ) || ""
+              }
+              onChangeText={(telephone) =>
+                setPersonalData({
+                  ...personalData,
+                  userPersonalData: {
+                    ...personalData.userPersonalData,
+                    telephone,
+                  },
+                })
+              }
+            />
 
-      <S.ChangePasswordContainer>
-        <TouchableOpacity onPress={() => navigate("ChangePassword")}>
-          <Typography size="small" weight="bold" color="gray">
-            ALTERAR SENHA
-          </Typography>
-        </TouchableOpacity>
-      </S.ChangePasswordContainer>
+            <Input
+              rightIcon
+              containerStyle={{
+                borderWidth: 1,
+                borderColor: colors.stroke,
+                marginBottom: 9,
+              }}
+              rightIconName="lock"
+              rightIconColor={colors.gray}
+              editable={false}
+              placeholderTextColor={colors.gray}
+              placeholder={personalData?.userPersonalData?.birthDate || ""}
+            />
+          </S.ChangePasswordContent>
 
-      <BottomButton>
-        <Button
-          title="Salvar"
-          txtColor="white"
-          size="large"
-          onPress={() => handleEditUser()}
-        />
-      </BottomButton>
+          <S.ChangePasswordContainer>
+            <TouchableOpacity onPress={() => navigate("ChangePassword")}>
+              <Typography size="small" weight="bold" color="gray">
+                ALTERAR SENHA
+              </Typography>
+            </TouchableOpacity>
+          </S.ChangePasswordContainer>
+
+          <BottomButton>
+            <Button
+              title="Salvar"
+              txtColor="white"
+              size="large"
+              onPress={() => handleEditUser()}
+            />
+          </BottomButton>
+        </>
+      )}
     </Container>
   );
 };

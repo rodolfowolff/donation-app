@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, FlatList, Pressable, StatusBar, View } from "react-native";
 
 import useFetch, { useSWRConfig } from "../../hooks/useFetch";
@@ -14,6 +14,7 @@ import {
   Button,
   CardComments,
   Input,
+  Skeleton,
 } from "../../components/common";
 import { AntDesign } from "@expo/vector-icons";
 import { Container, Divider, BottomButton } from "../../styles/global.style";
@@ -26,14 +27,19 @@ const OngDetails = () => {
   const { api, loading } = useGeneralContext();
   const { mutate } = useSWRConfig();
   const { colors } = useTheme();
-  const { goBack, navigate } = useNavigation();
+  const { reset, navigate } = useNavigation();
 
+  const [loadingOngDetails, setLoadingOngDetails] = useState(true);
+  const [ongDetails, setOngDetails] = useState<any>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [comment, setComment] = useState("");
 
   if (error) {
-    Alert.alert("Erro", "Não foi possível carregar os dados da ONG", [
-      { text: "OK", onPress: () => goBack() },
+    Alert.alert("Erro", "Erro ao carregar os detalhes da ong", [
+      {
+        text: "OK",
+        onPress: () => reset({ index: 0, routes: [{ name: "Index" }] }),
+      },
     ]);
   }
 
@@ -73,7 +79,15 @@ const OngDetails = () => {
     }
   };
 
-  if (!data || loading) return <Loading />;
+  useEffect(() => {
+    setLoadingOngDetails(true);
+    if (!error && !!data) {
+      setOngDetails(data);
+      setLoadingOngDetails(false);
+    }
+  }, [data]);
+
+  // if (!data || loading) return <Loading />;
 
   return (
     <Container>
@@ -106,117 +120,145 @@ const OngDetails = () => {
         }
       />
 
-      <FlatList
-        contentContainerStyle={{ paddingHorizontal: 16 }}
-        data={data.comments}
-        renderItem={renderComments}
-        keyExtractor={(item) => item.createdAt}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
-          <>
-            <S.BannerContentImg>
-              <S.BannerImg
-                source={
-                  data?.ongPersonalData?.banner
-                    ? { uri: data?.ongPersonalData?.banner }
-                    : ImageTeste
-                }
-                resizeMode="cover"
+      {loadingOngDetails ? (
+        <>
+          <Skeleton
+            width="90%"
+            height={200}
+            color="gray"
+            variant="card"
+            borderRadius={5}
+            marginBottom={20}
+          />
+
+          {[0, 1, 2].map((item) => (
+            <View key={item}>
+              <Skeleton
+                width="90%"
+                height={20}
+                color="gray"
+                variant="card"
+                borderRadius={10}
+                marginTop={10}
               />
-            </S.BannerContentImg>
-            <Typography
-              color="black"
-              size="large"
-              weight="regular"
-              style={{ marginTop: 10 }}
-            >
-              {data?.name || "Nome da ONG"}
-            </Typography>
-            <Typography
-              color="gray"
-              size="medium"
-              weight="bold"
-              style={{ marginTop: 5 }}
-            >
-              {data?.donations.length}{" "}
-              {data?.donations.length > 1
-                ? "doações recebidas"
-                : "doação recebida"}
-            </Typography>
-            <Divider />
-            <Typography color="gray" size="medium" weight="bold">
-              Email
-            </Typography>
-            <Typography
-              color="black"
-              size="large"
-              weight="regular"
-              style={{ marginTop: 5 }}
-            >
-              {data?.ongPersonalData?.email || "Não informado"}
-            </Typography>
-
-            <Divider />
-
-            <S.DescriptionContainer>
-              <Typography color="gray" size="medium" weight="bold">
-                Descrição
-              </Typography>
-            </S.DescriptionContainer>
-
-            <Typography
-              color="black"
-              size="large"
-              weight="regular"
-              style={{ marginBottom: 15 }}
-            >
-              {data?.ongPersonalData?.description || "Não informado"}
-            </Typography>
-
-            <Divider />
-
-            <S.CommentsContainer>
-              <Input
-                placeholder="Insira seu comentário"
-                containerStyle={{
-                  width: "80%",
-                  borderWidth: 1,
-                  borderColor: colors.stroke,
-                }}
-                onChangeText={(comment) => setComment(comment)}
-                value={comment}
-              />
-              <S.CommentButton
-                onPress={() => {
-                  handleCreateComment();
-                }}
-              >
-                <Typography color="white" size="medium" weight="regular">
-                  Enviar
+            </View>
+          ))}
+        </>
+      ) : (
+        <>
+          <FlatList
+            contentContainerStyle={{ paddingHorizontal: 16 }}
+            data={ongDetails.comments}
+            renderItem={renderComments}
+            keyExtractor={(item) => item.createdAt}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <>
+                <S.BannerContentImg>
+                  <S.BannerImg
+                    source={
+                      ongDetails?.ongPersonalData?.banner
+                        ? { uri: ongDetails?.ongPersonalData?.banner }
+                        : ImageTeste
+                    }
+                    resizeMode="cover"
+                  />
+                </S.BannerContentImg>
+                <Typography
+                  color="black"
+                  size="large"
+                  weight="regular"
+                  style={{ marginTop: 10 }}
+                >
+                  {ongDetails?.name || "Nome da ONG"}
                 </Typography>
-              </S.CommentButton>
-            </S.CommentsContainer>
+                <Typography
+                  color="gray"
+                  size="medium"
+                  weight="bold"
+                  style={{ marginTop: 5 }}
+                >
+                  {ongDetails?.donations.length}{" "}
+                  {ongDetails?.donations.length > 1
+                    ? "doações recebidas"
+                    : "doação recebida"}
+                </Typography>
+                <Divider />
+                <Typography color="gray" size="medium" weight="bold">
+                  Email
+                </Typography>
+                <Typography
+                  color="black"
+                  size="large"
+                  weight="regular"
+                  style={{ marginTop: 5 }}
+                >
+                  {ongDetails?.ongPersonalData?.email || "Não informado"}
+                </Typography>
 
-            <S.DescriptionContainer>
-              <Typography color="gray" size="medium" weight="regular">
-                Comentários
-              </Typography>
-              <Typography color="gray" size="medium" weight="regular">
-                ({data?.comments?.length || 0})
-              </Typography>
-            </S.DescriptionContainer>
-          </>
-        }
-      />
+                <Divider />
 
-      <BottomButton>
-        <Button
-          title="Doar agora"
-          txtColor="white"
-          size="large"
-          onPress={() => navigate("OngDonation", { ongId: params.id })}
-        />
-      </BottomButton>
+                <S.DescriptionContainer>
+                  <Typography color="gray" size="medium" weight="bold">
+                    Descrição
+                  </Typography>
+                </S.DescriptionContainer>
+
+                <Typography
+                  color="black"
+                  size="large"
+                  weight="regular"
+                  style={{ marginBottom: 15 }}
+                >
+                  {ongDetails?.ongPersonalData?.description || "Não informado"}
+                </Typography>
+
+                <Divider />
+
+                <S.CommentsContainer>
+                  <Input
+                    placeholder="Insira seu comentário"
+                    containerStyle={{
+                      width: "80%",
+                      borderWidth: 1,
+                      borderColor: colors.stroke,
+                    }}
+                    onChangeText={(comment) => setComment(comment)}
+                    value={comment}
+                  />
+                  <S.CommentButton
+                    onPress={() => {
+                      handleCreateComment();
+                    }}
+                  >
+                    <Typography color="white" size="medium" weight="regular">
+                      Enviar
+                    </Typography>
+                  </S.CommentButton>
+                </S.CommentsContainer>
+
+                <S.DescriptionContainer>
+                  <Typography color="gray" size="medium" weight="regular">
+                    Comentários
+                  </Typography>
+                  <Typography color="gray" size="medium" weight="regular">
+                    ({ongDetails?.comments?.length || 0})
+                  </Typography>
+                </S.DescriptionContainer>
+              </>
+            }
+          />
+
+          <BottomButton>
+            <Button
+              title="Doar agora"
+              txtColor="white"
+              size="large"
+              onPress={() => navigate("OngDonation", { ongId: params.id })}
+            />
+          </BottomButton>
+        </>
+      )}
     </Container>
   );
 };

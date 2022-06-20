@@ -17,9 +17,7 @@ const verifyDocument = (document: string, docLength: number, type: string) => {
 
 const verifyName = (name: string) => {
   if (name === undefined) return false;
-  console.log("name: ", name);
   const regex = /^[A-zÀ-Ũà-ũ]+$/;
-  console.log(" regex.test(name): ", regex.test(name));
   return regex.test(name);
 };
 
@@ -35,7 +33,6 @@ const verifyPhoneNumber = (phoneNumber: string) => {
     return false;
   const regex =
     /^\((?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|7[134579])\) (?:[2-8]|9[1-9])[0-9]{2,3}\-[0-9]{4,5}$/;
-  console.log("x: ", phoneNumber);
   return regex.test(phoneNumber);
 };
 
@@ -51,7 +48,7 @@ const verifyGeneralText = (
   maxLength: number
 ) => {
   if (!text || text.length < minLength || text.length > maxLength) return false;
-  const regex = /^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%&*(){}|~<>;:[\]]{1,}$/;
+  const regex = /^[\w'\-,.0-9_!¡?÷?¿/\\+=@#$%&*(){}|~<>;:[\]]{1,}$/;
   return regex.test(text);
 };
 

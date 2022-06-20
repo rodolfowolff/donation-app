@@ -6,7 +6,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../context/auth";
 
 //Pages
-import { Loading } from "../components/common";
 import Onboarding from "../pages/Onboarding";
 
 import LoginDocument from "../pages/Login/LoginDocument";
@@ -17,7 +16,7 @@ import RegisterAddress from "../pages/Register/RegisterAddress";
 import RegisterPassword from "../pages/Register/RegisterPassword";
 import ChangePassword from "../pages/Profile/ChangePassword";
 
-import { BottomNav } from "./TabNavigator";
+import TabNavigator from "./TabNavigator";
 import OngDetails from "../pages/OngDetails";
 import OngDonation from "../pages/OngDonation";
 
@@ -33,9 +32,9 @@ declare global {
       RegisterPassword: { type: string };
       ChangePassword: undefined;
       Index: {
-        type: string;
-        name: string;
-        token: string;
+        type?: string;
+        name?: string;
+        token?: string;
       };
       OngDetails: { id: string };
       OngDonation: { ongId: string };
@@ -47,7 +46,6 @@ const Stack = createNativeStackNavigator();
 
 const AppNavigator = () => {
   const { isAuth, setIsAuth, setPersonalData } = useAuth();
-  const [loading, setLoading] = useState(true);
 
   const verifyToken = async () => {
     const token = await AsyncStorage.getItem("@token_donation_app");
@@ -56,23 +54,34 @@ const AppNavigator = () => {
     if (token) {
       setIsAuth(true);
       if (personalData) {
+        console.log("token: ", token, "personalData: ", personalData);
         setPersonalData(JSON.parse(personalData));
       }
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    verifyToken();
+    setTimeout(() => {
+      verifyToken();
+    }, 1000);
+
+    return () => {
+      clearTimeout(1000);
+    };
   }, []);
 
   return (
     //@ts-ignore
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {loading && <Stack.Screen name="Loading" component={Loading} />}
-      {!isAuth ? (
-        //@ts-ignore
-        <Stack.Group>
+      {isAuth ? (
+        <>
+          <Stack.Screen name="Index" component={TabNavigator} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} />
+          <Stack.Screen name="OngDetails" component={OngDetails} />
+          <Stack.Screen name="OngDonation" component={OngDonation} />
+        </>
+      ) : (
+        <>
           <Stack.Screen name="Onboarding" component={Onboarding} />
           <Stack.Screen name="LoginDocument" component={LoginDocument} />
           <Stack.Screen name="LoginPassword" component={LoginPassword} />
@@ -82,15 +91,7 @@ const AppNavigator = () => {
           />
           <Stack.Screen name="RegisterAddress" component={RegisterAddress} />
           <Stack.Screen name="RegisterPassword" component={RegisterPassword} />
-        </Stack.Group>
-      ) : (
-        //@ts-ignore
-        <Stack.Group>
-          <Stack.Screen name="Index" component={BottomNav} />
-          <Stack.Screen name="ChangePassword" component={ChangePassword} />
-          <Stack.Screen name="OngDetails" component={OngDetails} />
-          <Stack.Screen name="OngDonation" component={OngDonation} />
-        </Stack.Group>
+        </>
       )}
     </Stack.Navigator>
   );

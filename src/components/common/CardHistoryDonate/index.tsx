@@ -16,7 +16,7 @@ interface IDonationHistoryProps {
   };
 }
 
-const CardHistoryDonate = ({ data }: IDonationHistoryProps) => {
+const CardHistoryDonate: React.FC<IDonationHistoryProps> = ({ data }) => {
   const dateFormatted = dateFormat(data?.createdAt);
 
   return (

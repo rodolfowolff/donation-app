@@ -3,7 +3,7 @@ import styled from "styled-components/native";
 
 export const ContainerCard = styled.View`
   width: 100%;
-  min-height: 100px;
+  min-height: 240px;
   background-color: ${({ theme }) => theme.colors.white};
   border: 1px solid ${({ theme }) => theme.colors.stroke};
   border-radius: 16px;
@@ -14,7 +14,7 @@ export const ContainerCard = styled.View`
 
 export const ImageCard = styled.Image`
   width: 100%;
-  height: 108px;
+  height: 115px;
   border-radius: 10px;
 `;
 

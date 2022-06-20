@@ -7,6 +7,7 @@ import { useGeneralContext } from "../../context/general";
 import { useRegister } from "../../context/register";
 import { useAuth } from "../../context/auth";
 
+import { verifyGeneralText } from "../../utils/verifyInput";
 import { useTheme } from "styled-components";
 import { Button, Typography, Input, Loading } from "../../components/common";
 import { Container, Content, BgImage } from "../../styles/global.style";
@@ -23,6 +24,7 @@ const LoginPassword = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
+  const [validPassword, setValidPassword] = useState(false);
 
   const handleLogin = async () => {
     if (password === "" || password.length < 8 || password.length > 20) {
@@ -62,8 +64,9 @@ const LoginPassword = () => {
             : JSON.stringify(data.ong)
         );
 
-        resetState();
         setIsAuth(true);
+
+        resetState();
         setPersonalData(params.type === "donation" ? data.user : data.ong);
 
         return;
@@ -126,7 +129,11 @@ const LoginPassword = () => {
             secureTextEntry={!showPassword}
             rightIconPress={() => setShowPassword(!showPassword)}
             value={password}
-            onChangeText={(pass) => setPassword(pass)}
+            onChangeText={(pass) => {
+              setPassword(pass);
+              const isValid = verifyGeneralText(pass, 8, 20);
+              isValid ? setValidPassword(true) : setValidPassword(false);
+            }}
             maxLength={20}
             autoCorrect={false}
           />
@@ -134,11 +141,12 @@ const LoginPassword = () => {
 
         <Button
           title="Continuar"
-          bgColor="white"
+          bgColor={!validPassword ? "gray" : "white"}
           txtColor="primary"
           size="large"
           weight="bold"
           margin={30}
+          disabled={!validPassword}
           onPress={() => {
             handleLogin();
           }}
