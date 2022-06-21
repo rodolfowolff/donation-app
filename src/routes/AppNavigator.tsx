@@ -30,12 +30,12 @@ declare global {
       RegisterPersonalData: { type: string };
       RegisterAddress: { type: string };
       RegisterPassword: { type: string };
-      ChangePassword: undefined;
       Index: {
         type?: string;
         name?: string;
         token?: string;
       };
+      ChangePassword: undefined;
       OngDetails: { id: string };
       OngDonation: { ongId: string };
     }
@@ -76,9 +76,9 @@ const AppNavigator = () => {
       {isAuth ? (
         <>
           <Stack.Screen name="Index" component={TabNavigator} />
-          <Stack.Screen name="ChangePassword" component={ChangePassword} />
           <Stack.Screen name="OngDetails" component={OngDetails} />
           <Stack.Screen name="OngDonation" component={OngDonation} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} />
         </>
       ) : (
         <>

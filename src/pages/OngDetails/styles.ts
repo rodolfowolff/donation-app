@@ -27,12 +27,3 @@ export const CommentsContainer = styled.View`
   align-items: center;
   margin-bottom: 20px;
 `;
-
-export const CommentButton = styled.TouchableOpacity`
-  width: 18%;
-  height: 50px;
-  border-radius: 10px;
-  background-color: ${({ theme }) => theme.colors.primary};
-  justify-content: center;
-  align-items: center;
-`;

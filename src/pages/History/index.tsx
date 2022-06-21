@@ -15,7 +15,9 @@ import { Container } from "../../styles/global.style";
 
 const History = () => {
   const { personalData } = useAuth();
-  const { data, error } = useFetch(`/donations/user/${personalData.id}`);
+  const { data, error, isValidating } = useFetch(
+    `/donations/user/${personalData.id}`
+  );
   const { reset } = useNavigation();
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);

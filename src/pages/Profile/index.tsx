@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StatusBar,
-  TouchableOpacity,
-} from "react-native";
+import { Alert, Pressable, StatusBar, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,7 +21,7 @@ import {
 import { BottomButton, Container } from "../../styles/global.style";
 import * as S from "./styles";
 
-const Profile = () => {
+const ChangePassword = () => {
   const { personalData, setPersonalData, setIsAuth } = useAuth();
   const { colors } = useTheme();
   const { reset, goBack, navigate } = useNavigation();
@@ -163,7 +157,7 @@ const Profile = () => {
       />
       <Header
         back
-        title="PERFIL DO USUARIO"
+        title="ALTERAR SENHA"
         rightComponent={
           <Pressable onPress={() => handleLogout()}>
             {/* @ts-ignore */}
@@ -307,4 +301,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ChangePassword;

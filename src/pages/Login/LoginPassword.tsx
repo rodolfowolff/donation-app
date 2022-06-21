@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StatusBar, View, Pressable, Alert } from "react-native";
+import { StatusBar, View, Pressable, Alert, BackHandler } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -25,8 +25,27 @@ const LoginPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [validPassword, setValidPassword] = useState(false);
+  const [loginErrorCount, setLoginErrorCount] = useState(0);
 
   const handleLogin = async () => {
+    console.log("loginErrorCount: ", loginErrorCount);
+
+    if (loginErrorCount >= 3) {
+      console.log("loginErrorCount > 3: ", loginErrorCount);
+      Alert.alert(
+        "Erro login",
+        "Você errou mais de 3 tentativas, encerrando aplicado.",
+        [{ text: "OK", onPress: () => null }],
+        { cancelable: false }
+      );
+      resetState();
+      goBack();
+      setTimeout(() => {
+        BackHandler.exitApp();
+      }, 1500);
+      return;
+    }
+
     if (password === "" || password.length < 8 || password.length > 20) {
       Alert.alert(
         "Senha inválida",
@@ -47,15 +66,7 @@ const LoginPassword = () => {
           password: `${password}`,
         },
       } as any);
-
-      if (data.error) {
-        console.log("data.error: ", data.error);
-        Alert.alert(
-          "Erro",
-          data.error.response.data.message || "Erro desconhecido"
-        );
-        return;
-      } else if (data && data.token) {
+      if (data && data.token) {
         await AsyncStorage.setItem("@token_donation_app", data.token);
         await AsyncStorage.setItem(
           "@personal_donation_app",
@@ -70,21 +81,33 @@ const LoginPassword = () => {
         setPersonalData(params.type === "donation" ? data.user : data.ong);
 
         return;
-      } else {
-        Alert.alert("Erro", "Erro desconhecido");
-        return;
       }
+
+      console.log("data na page password: ", data);
+      setLoginErrorCount(loginErrorCount + 1);
+      setPassword("");
+      Alert.alert("Erro", "Aconteceu algum erro, tente novamente.");
+      return;
     } catch (error: any) {
       console.log("error na page password: ", error.response.data || error);
+      setLoginErrorCount(loginErrorCount + 1);
+      setPassword("");
       if (
         error.response.data.message === "Ong or password invalid" ||
         error.response.data.message === "User or password invalid"
       ) {
+        if (loginErrorCount === 2) {
+          Alert.alert(
+            "Erro login",
+            "Você só tem mais uma tentativa para continuar."
+          );
+          return;
+        }
         Alert.alert("Erro", "Documento ou senha inválidos");
         return;
       }
       Alert.alert(
-        "Erro no servidor",
+        "Erro",
         "Erro ao conectar com nosso servidor, tente novamente mais tarde."
       );
       return;
@@ -141,15 +164,14 @@ const LoginPassword = () => {
 
         <Button
           title="Continuar"
-          bgColor={!validPassword ? "gray" : "white"}
-          txtColor="primary"
+          txtColor={!validPassword ? "white" : "primary"}
+          bgColor={!validPassword ? "white" : "white"}
+          outline={!validPassword}
           size="large"
           weight="bold"
           margin={30}
           disabled={!validPassword}
-          onPress={() => {
-            handleLogin();
-          }}
+          onPress={() => handleLogin()}
         />
       </Content>
     </Container>

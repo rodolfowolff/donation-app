@@ -6,11 +6,11 @@ import { useGeneralContext } from "../../context/general";
 import { useRoute } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "styled-components";
+import { verifyGeneralText } from "../../utils/verifyInput";
 
 import {
   Header,
   Typography,
-  Loading,
   Button,
   CardComments,
   Input,
@@ -24,7 +24,7 @@ import ImageTeste from "../../assets/images/onboarding-bg.png";
 const OngDetails = () => {
   const { params }: any = useRoute();
   const { data, error } = useFetch(`/ongs/${params.id}`);
-  const { api, loading } = useGeneralContext();
+  const { api } = useGeneralContext();
   const { mutate } = useSWRConfig();
   const { colors } = useTheme();
   const { reset, navigate } = useNavigation();
@@ -33,6 +33,8 @@ const OngDetails = () => {
   const [ongDetails, setOngDetails] = useState<any>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [comment, setComment] = useState("");
+  const [loadingComment, setLoadingComment] = useState(false);
+  const [validComment, setValidComment] = useState(false);
 
   if (error) {
     Alert.alert("Erro", "Erro ao carregar os detalhes da ong", [
@@ -43,7 +45,26 @@ const OngDetails = () => {
     ]);
   }
 
-  const renderComments = ({ item }: any) => <CardComments data={item} />;
+  const renderComments = ({ item }: any) => {
+    if (loadingComment) {
+      return [0, 1].map((item) => (
+        <View key={item}>
+          <Skeleton
+            width="100%"
+            height={15}
+            color="gray"
+            variant="card"
+            borderRadius={5}
+            marginTop={5}
+            marginBottom={10}
+            marginLeft={0}
+          />
+        </View>
+      ));
+    } else {
+      return <CardComments data={item} />;
+    }
+  };
 
   const handleCreateComment = async () => {
     if (!comment || comment.length < 3) {
@@ -52,6 +73,7 @@ const OngDetails = () => {
     }
 
     try {
+      setLoadingComment(true);
       const { data } = await api({
         entity: "comment",
         action: "createComment",
@@ -64,16 +86,19 @@ const OngDetails = () => {
       if (data.message === "Comment created successfully") {
         setComment("");
         mutate(`/ongs/${params.id}`);
+        setLoadingComment(false);
         Alert.alert("Sucesso", "Comentário criado com sucesso");
         return;
       } else {
         setComment("");
+        setLoadingComment(false);
         Alert.alert("Erro", "Não foi possível criar o comentário");
         return;
       }
     } catch (error: any) {
       console.log("error no create comment: ", error);
       setComment("");
+      setLoadingComment(false);
       Alert.alert("ERRO", "Erro no servidor, tente novamente mais tarde.");
       return;
     }
@@ -87,7 +112,9 @@ const OngDetails = () => {
     }
   }, [data]);
 
-  // if (!data || loading) return <Loading />;
+  useEffect(() => {
+    //
+  }, [loadingComment]);
 
   return (
     <Container>
@@ -149,7 +176,7 @@ const OngDetails = () => {
           <FlatList
             contentContainerStyle={{ paddingHorizontal: 16 }}
             data={ongDetails.comments}
-            renderItem={renderComments}
+            renderItem={renderComments as any}
             keyExtractor={(item) => item.createdAt}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
@@ -223,18 +250,24 @@ const OngDetails = () => {
                       borderWidth: 1,
                       borderColor: colors.stroke,
                     }}
-                    onChangeText={(comment) => setComment(comment)}
-                    value={comment}
-                  />
-                  <S.CommentButton
-                    onPress={() => {
-                      handleCreateComment();
+                    onChangeText={(comment) => {
+                      setComment(comment);
+                      const isValid = verifyGeneralText(comment, 3, 100);
+                      isValid ? setValidComment(true) : setValidComment(false);
                     }}
-                  >
-                    <Typography color="white" size="medium" weight="regular">
-                      Enviar
-                    </Typography>
-                  </S.CommentButton>
+                    value={comment}
+                    editable={!loadingComment}
+                  />
+                  <Button
+                    title="Enviar"
+                    txtColor="white"
+                    bgColor={!validComment ? "gray" : "primary"}
+                    size="medium"
+                    weight="regular"
+                    style={{ width: "18%" }}
+                    disabled={!validComment && loadingComment}
+                    onPress={() => handleCreateComment()}
+                  />
                 </S.CommentsContainer>
 
                 <S.DescriptionContainer>

@@ -16,7 +16,7 @@ const verifyDocument = (document: string, docLength: number, type: string) => {
 };
 
 const verifyName = (name: string) => {
-  if (name === undefined) return false;
+  if (name === undefined || name.length < 3 || name.length > 50) return false;
   const regex = /^[A-zÀ-Ũà-ũ]+$/;
   return regex.test(name);
 };

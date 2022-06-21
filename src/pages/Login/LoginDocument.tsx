@@ -90,6 +90,7 @@ const LoginDocument = () => {
               document: documentUnMasked,
             });
 
+        setDocument("");
         navigate("LoginPassword", {
           type: params.type,
         });
@@ -97,18 +98,21 @@ const LoginDocument = () => {
       }
       if (data.status === false) {
         console.log("data.error false: ", data);
+        setDocument("");
         navigate("RegisterPersonalData", {
           type: params.type,
         });
         return;
-      } else {
-        console.log("data.error: ", data);
-        resetState();
-        Alert.alert("Erro", "Erro ao verificar documento");
-        return;
       }
+
+      console.log("data.error: ", data);
+      setDocument("");
+      resetState();
+      Alert.alert("Erro", "Erro ao verificar documento");
+      return;
     } catch (error: any) {
       console.log("error no check document: ", error);
+      setDocument("");
       resetState();
       Alert.alert("ERRO", "Erro no servidor, tente novamente mais tarde.");
       return;
@@ -179,8 +183,9 @@ const LoginDocument = () => {
 
           <Button
             title="Continuar"
-            txtColor="primary"
-            bgColor={!validDocument ? "gray" : "white"}
+            txtColor={!validDocument ? "white" : "primary"}
+            bgColor={!validDocument ? "white" : "white"}
+            outline={!validDocument}
             size="large"
             weight="bold"
             margin={30}
