@@ -27,7 +27,7 @@ import {
 import { BottomButton, Container } from "../../styles/global.style";
 import * as S from "./styles";
 
-const Profile = () => {
+const ChangePassowrd = () => {
   const { personalData, setPersonalData, setIsAuth } = useAuth();
   const { colors } = useTheme();
   const { reset, goBack, navigate } = useNavigation();
@@ -163,7 +163,7 @@ const Profile = () => {
       />
       <Header
         back
-        title="PERFIL DO USUARIO"
+        title="ALTERAR SENHA"
         rightComponent={
           <Pressable onPress={() => handleLogout()}>
             {/* @ts-ignore */}
@@ -307,4 +307,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ChangePassowrd;

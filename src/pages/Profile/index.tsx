@@ -6,7 +6,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../../context/auth";
 import useFetch, { useSWRConfig } from "../../hooks/useFetch";
 import { useGeneralContext } from "../../context/general";
+import { useRegister } from "../../context/register";
 import { cpfCnpjMask, telephoneMask } from "js-essentials-functions";
+import { verifyEmail, verifyPhoneNumber } from "../../utils/verifyInput";
 
 import { useTheme } from "styled-components/native";
 import { AntDesign } from "@expo/vector-icons";
@@ -21,15 +23,15 @@ import {
 import { BottomButton, Container } from "../../styles/global.style";
 import * as S from "./styles";
 
-const ChangePassword = () => {
+const Profile = () => {
   const { personalData, setPersonalData, setIsAuth } = useAuth();
+  const { resetState } = useRegister();
   const { colors } = useTheme();
   const { reset, goBack, navigate } = useNavigation();
-  const { data, error } = useFetch(`/users/${personalData.id}`);
+  const { data, error, loading } = useFetch(`/users/${personalData.id}`);
   const { api } = useGeneralContext();
   const { mutate } = useSWRConfig();
 
-  const [loadingUser, setLoadingUser] = useState(true);
   const [loadingLogout, setLoadingLogout] = useState(false);
 
   if (error) {
@@ -40,15 +42,14 @@ const ChangePassword = () => {
         onPress: () => reset({ index: 0, routes: [{ name: "Index" }] }),
       },
     ]);
+    return null;
   }
 
   useEffect(() => {
-    setLoadingUser(true);
-    if (!error && !!data) {
+    if (!loading) {
       setPersonalData({ ...personalData, ...data });
-      setLoadingUser(false);
     }
-  }, [data]);
+  }, [loading]);
 
   useEffect(() => {
     if (loadingLogout) {
@@ -65,6 +66,7 @@ const ChangePassword = () => {
   const handleLogout = async () => {
     setLoadingLogout(true);
     await AsyncStorage.clear();
+    resetState();
 
     setTimeout(() => {
       setLoadingLogout(false);
@@ -72,41 +74,36 @@ const ChangePassword = () => {
   };
 
   const handleEditUser = async () => {
-    setLoadingUser(true);
-
-    if (personalData.userPersonalData.email.length === 0) {
-      Alert.alert("Erro", "O campo e-mail não pode estar vazio");
-      setLoadingUser(false);
+    if (!verifyEmail(personalData.userPersonalData.email)) {
+      Alert.alert("Email inválido", "Por favor, informe um email válido");
       return;
     }
 
     if (
-      personalData.userPersonalData.email.length < 5 ||
-      personalData.userPersonalData.email.length > 40
+      !verifyPhoneNumber(
+        telephoneMask(personalData.userPersonalData.telephone || "")
+      )
     ) {
-      Alert.alert("Erro", "O campo e-mail deve ter entre 5 e 40 caracteres");
-      setLoadingUser(false);
+      Alert.alert("Telefone inválido", "Por favor, informe um telefone válido");
       return;
     }
 
-    if (personalData.userPersonalData.telephone.length === 0) {
-      Alert.alert("Erro", "O campo e-mail não pode estar vazio");
-      setLoadingUser(false);
-      return;
-    }
+    const personalStorage = await AsyncStorage.getItem(
+      "@personal_donation_app"
+    );
+    const personalDataParse = JSON.parse(personalStorage || "{}");
 
     if (
-      personalData.userPersonalData.telephone.length < 14 ||
-      personalData.userPersonalData.telephone.length > 15 ||
-      !telephoneMask(personalData.userPersonalData.telephone || "")
+      personalDataParse.userPersonalData.email ===
+        personalData.userPersonalData.email &&
+      personalDataParse.userPersonalData.telephone ===
+        personalData.userPersonalData.telephone
     ) {
-      Alert.alert("Erro", "O campo nome não pode estar vazio");
-      setLoadingUser(false);
+      Alert.alert("ERRO:", "Nenhuma alteração foi realizada");
       return;
     }
 
     try {
-      setLoadingUser(true);
       const { data: dataApi } = await api({
         entity: "user",
         action: "updateUser",
@@ -141,8 +138,6 @@ const ChangePassword = () => {
         { text: "OK", onPress: () => goBack() },
       ]);
       return;
-    } finally {
-      setLoadingUser(false);
     }
   };
 
@@ -157,7 +152,7 @@ const ChangePassword = () => {
       />
       <Header
         back
-        title="ALTERAR SENHA"
+        title="PERFIL DO USUÁRIO"
         rightComponent={
           <Pressable onPress={() => handleLogout()}>
             {/* @ts-ignore */}
@@ -166,7 +161,7 @@ const ChangePassword = () => {
         }
       />
 
-      {loadingUser ? (
+      {loading ? (
         <>
           <Skeleton
             width="50%"
@@ -301,4 +296,4 @@ const ChangePassword = () => {
   );
 };
 
-export default ChangePassword;
+export default Profile;

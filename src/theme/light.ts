@@ -25,13 +25,13 @@ export const light = {
   colors: {
     primary: "#2d2d2d",
     black: "#202020",
-    white: "#FBFBFB",
+    white: "#FFFFFF",
     gray: "#696969",
     danger: "#FF0000",
     success: "#00FF00",
     warning: "#FFD700",
     info: "#0000FF",
-    bg: "#F0F0F0",
+    bg: "#FBFBFB",
     stroke: "#E0E0E0",
   },
   fonts: {

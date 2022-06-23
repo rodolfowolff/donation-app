@@ -14,16 +14,16 @@ import LoginPassword from "../pages/Login/LoginPassword";
 import RegisterPersonalData from "../pages/Register/RegisterPersonalData";
 import RegisterAddress from "../pages/Register/RegisterAddress";
 import RegisterPassword from "../pages/Register/RegisterPassword";
-import ChangePassword from "../pages/Profile/ChangePassword";
 
 import TabNavigator from "./TabNavigator";
+import Profile from "../pages/Profile";
+import ChangePassword from "../pages/Profile/ChangePassword";
 import OngDetails from "../pages/OngDetails";
 import OngDonation from "../pages/OngDonation";
 
 declare global {
   namespace ReactNavigation {
     interface RootParamList {
-      Loading: undefined;
       Onboarding: undefined;
       LoginDocument: { type: string };
       LoginPassword: { type: string };
@@ -35,6 +35,7 @@ declare global {
         name?: string;
         token?: string;
       };
+      Profile: undefined;
       ChangePassword: undefined;
       OngDetails: { id: string };
       OngDonation: { ongId: string };
@@ -77,6 +78,7 @@ const AppNavigator = () => {
           <Stack.Screen name="Index" component={TabNavigator} />
           <Stack.Screen name="OngDetails" component={OngDetails} />
           <Stack.Screen name="OngDonation" component={OngDonation} />
+          <Stack.Screen name="Profile" component={Profile} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
         </>
       ) : (
