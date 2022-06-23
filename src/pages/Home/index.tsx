@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Alert, FlatList, StatusBar, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Alert,
+  FlatList,
+  StatusBar,
+  View,
+  ListRenderItemInfo,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { useAuth } from "../../context/auth";
@@ -16,21 +22,18 @@ import {
 import { Container } from "../../styles/global.style";
 import * as S from "./styles";
 import Icon from "@expo/vector-icons/FontAwesome5";
+import { IOng } from "../../dtos/ongDTO";
 
 const Home = () => {
   const { setIsAuth, personalData } = useAuth();
   const [search, setSearch] = useState("");
-  const { data, error } = useFetch(
-    search && search.length > 2
-      ? `/ongs/findall?name=${search}`
-      : "/ongs/findall"
+  const { data, error, loading } = useFetch(
+    search.length > 2 ? `/ongs/findall?name=${search}` : "/ongs/findall"
   );
   const { colors } = useTheme();
 
-  const [ongs, setOngs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
   const handleLogout = async () => {
+    //colocar loading
     setIsAuth(false);
     await AsyncStorage.clear();
   };
@@ -39,18 +42,12 @@ const Home = () => {
     Alert.alert("Erro", "Não foi possível carregar os dados", [
       { text: "OK", onPress: () => handleLogout() },
     ]);
+    return null;
   }
 
-  useEffect(() => {
-    setLoading(true);
-
-    if (!error && !!data) {
-      setOngs(data);
-      setLoading(false);
-    }
-  }, [data]);
-
-  const renderOngs = ({ item }: any) => <CardOng ong={item} />;
+  const renderOngs = ({ item }: ListRenderItemInfo<IOng>) => (
+    <CardOng {...item} />
+  );
 
   return (
     <Container>
@@ -121,26 +118,26 @@ const Home = () => {
               ))}
             </>
           ) : (
-            <FlatList
-              data={data || []}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item) => item.id}
-              ListHeaderComponent={
-                <Typography
-                  color="gray"
-                  size="medium"
-                  weight="bold"
-                  style={{ marginVertical: 7 }}
-                >
-                  {data.length > 0
-                    ? "Ongs próximas a você"
-                    : data.length === 0 && search.length > 2
-                    ? "Nenhuma ONG com esse nome foi encontrada"
-                    : "Nenhuma ONG próxima foi encontrada"}
-                </Typography>
-              }
-              renderItem={renderOngs}
-            />
+            <>
+              <Typography
+                color="gray"
+                size="medium"
+                weight="bold"
+                style={{ marginVertical: 7 }}
+              >
+                {!!data && search.length > 2
+                  ? "ONGs próximas a você:"
+                  : !!data && data.length > 0
+                  ? "ONGs encontradas:"
+                  : "Nenhuma ONG encontrada"}
+              </Typography>
+              <FlatList
+                data={data || []}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                renderItem={renderOngs}
+              />
+            </>
           )}
         </S.ContentHeaderHome>
       </S.ContentHome>

@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 
+import { IOng } from "../../../dtos/ongDTO";
+
 import * as S from "./styles";
 import ImageTeste from "../../../assets/images/onboarding-bg.png";
 import { Typography } from "../Text";
@@ -8,7 +10,7 @@ import { Button } from "../Button";
 import Icon from "@expo/vector-icons/FontAwesome5";
 import { useTheme } from "styled-components";
 
-const CardOng = ({ ong }: any) => {
+const CardOng = ({ id: ongID, name, ongPersonalData }: IOng) => {
   const { navigate } = useNavigation();
   const { colors } = useTheme();
 
@@ -20,8 +22,8 @@ const CardOng = ({ ong }: any) => {
 
       <S.ImageCard
         source={
-          ong?.ongPersonalData?.banner
-            ? { uri: ong?.ongPersonalData?.banner }
+          ongPersonalData?.banner
+            ? { uri: ongPersonalData?.banner }
             : ImageTeste
         }
         resizeMode="cover"
@@ -32,7 +34,7 @@ const CardOng = ({ ong }: any) => {
         weight="bold"
         style={{ marginTop: 2, marginHorizontal: 3 }}
       >
-        {ong?.name}
+        {name}
       </Typography>
       <Typography
         color="gray"
@@ -42,7 +44,7 @@ const CardOng = ({ ong }: any) => {
         ellipsizeMode="tail"
         numberOfLines={2}
       >
-        {ong?.ongPersonalData?.description || "Não informado"}
+        {ongPersonalData?.description || "Não informado"}
       </Typography>
       <Button
         title="Ver mais"
@@ -50,7 +52,7 @@ const CardOng = ({ ong }: any) => {
         txtColor="white"
         size="medium"
         weight="regular"
-        onPress={() => navigate("OngDetails", { id: ong.id })}
+        onPress={() => navigate("OngDetails", { id: ongID })}
       />
     </S.ContainerCard>
   );

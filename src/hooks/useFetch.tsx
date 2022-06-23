@@ -15,5 +15,6 @@ export default (url: string | null) => {
       revalidateOnFocus: true, //revalidate on focus to component if user moved to another tab or window
     }
   );
-  return { data, error, isValidating };
+  const loading = isValidating || !data;
+  return { data, error, isValidating, loading };
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, FlatList, Pressable, StatusBar, View } from "react-native";
 
 import useFetch, { useSWRConfig } from "../../hooks/useFetch";
@@ -23,14 +23,12 @@ import ImageTeste from "../../assets/images/onboarding-bg.png";
 
 const OngDetails = () => {
   const { params }: any = useRoute();
-  const { data, error } = useFetch(`/ongs/${params.id}`);
+  const { data: ongData, error, loading } = useFetch(`/ongs/${params.id}`);
   const { api } = useGeneralContext();
   const { mutate } = useSWRConfig();
   const { colors } = useTheme();
   const { reset, navigate } = useNavigation();
 
-  const [loadingOngDetails, setLoadingOngDetails] = useState(true);
-  const [ongDetails, setOngDetails] = useState<any>([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [comment, setComment] = useState("");
   const [loadingComment, setLoadingComment] = useState(false);
@@ -43,38 +41,23 @@ const OngDetails = () => {
         onPress: () => reset({ index: 0, routes: [{ name: "Index" }] }),
       },
     ]);
+    return null;
   }
 
-  const renderComments = ({ item }: any) => {
-    if (loadingComment) {
-      return [0, 1].map((item) => (
-        <View key={item}>
-          <Skeleton
-            width="100%"
-            height={15}
-            color="gray"
-            variant="card"
-            borderRadius={5}
-            marginTop={5}
-            marginBottom={10}
-            marginLeft={0}
-          />
-        </View>
-      ));
-    } else {
-      return <CardComments data={item} />;
-    }
-  };
+  const renderComments = ({ item }: any) => <CardComments data={item} />;
 
   const handleCreateComment = async () => {
-    if (!comment || comment.length < 3) {
-      Alert.alert("Erro", "O comentário deve ter no mínimo 3 caracteres");
+    if (!verifyGeneralText(comment, 3, 50)) {
+      Alert.alert(
+        "Comentário inválido",
+        "Comentário deve ter no mínimo 10 caracteres e no máximo 50"
+      );
       return;
     }
 
     try {
       setLoadingComment(true);
-      const { data } = await api({
+      const { data: commentsData } = await api({
         entity: "comment",
         action: "createComment",
         payload: {
@@ -83,38 +66,25 @@ const OngDetails = () => {
         },
       } as any);
 
-      if (data.message === "Comment created successfully") {
+      if (commentsData.message === "Comment created successfully") {
         setComment("");
         mutate(`/ongs/${params.id}`);
-        setLoadingComment(false);
         Alert.alert("Sucesso", "Comentário criado com sucesso");
         return;
       } else {
         setComment("");
-        setLoadingComment(false);
         Alert.alert("Erro", "Não foi possível criar o comentário");
         return;
       }
     } catch (error: any) {
       console.log("error no create comment: ", error);
       setComment("");
-      setLoadingComment(false);
       Alert.alert("ERRO", "Erro no servidor, tente novamente mais tarde.");
       return;
+    } finally {
+      setLoadingComment(false);
     }
   };
-
-  useEffect(() => {
-    setLoadingOngDetails(true);
-    if (!error && !!data) {
-      setOngDetails(data);
-      setLoadingOngDetails(false);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    //
-  }, [loadingComment]);
 
   return (
     <Container>
@@ -131,7 +101,7 @@ const OngDetails = () => {
               Informações
             </Typography>
             <Typography color="gray" size="medium" weight="regular">
-              Ajude e faça o bem ao próximo
+              ONG
             </Typography>
           </View>
         }
@@ -147,7 +117,7 @@ const OngDetails = () => {
         }
       />
 
-      {loadingOngDetails ? (
+      {loading || loadingComment ? (
         <>
           <Skeleton
             width="90%"
@@ -175,7 +145,7 @@ const OngDetails = () => {
         <>
           <FlatList
             contentContainerStyle={{ paddingHorizontal: 16 }}
-            data={ongDetails.comments}
+            data={ongData.comments || []}
             renderItem={renderComments as any}
             keyExtractor={(item) => item.createdAt}
             showsVerticalScrollIndicator={false}
@@ -184,8 +154,8 @@ const OngDetails = () => {
                 <S.BannerContentImg>
                   <S.BannerImg
                     source={
-                      ongDetails?.ongPersonalData?.banner
-                        ? { uri: ongDetails?.ongPersonalData?.banner }
+                      ongData?.ongPersonalData?.banner
+                        ? { uri: ongData?.ongPersonalData?.banner }
                         : ImageTeste
                     }
                     resizeMode="cover"
@@ -197,7 +167,7 @@ const OngDetails = () => {
                   weight="regular"
                   style={{ marginTop: 10 }}
                 >
-                  {ongDetails?.name || "Nome da ONG"}
+                  {ongData?.name || "Nome da ONG"}
                 </Typography>
                 <Typography
                   color="gray"
@@ -205,8 +175,8 @@ const OngDetails = () => {
                   weight="bold"
                   style={{ marginTop: 5 }}
                 >
-                  {ongDetails?.donations.length}{" "}
-                  {ongDetails?.donations.length > 1
+                  {ongData?.donations.length}{" "}
+                  {ongData?.donations.length > 1
                     ? "doações recebidas"
                     : "doação recebida"}
                 </Typography>
@@ -220,7 +190,7 @@ const OngDetails = () => {
                   weight="regular"
                   style={{ marginTop: 5 }}
                 >
-                  {ongDetails?.ongPersonalData?.email || "Não informado"}
+                  {ongData?.ongPersonalData?.email || "Não informado"}
                 </Typography>
 
                 <Divider />
@@ -237,7 +207,7 @@ const OngDetails = () => {
                   weight="regular"
                   style={{ marginBottom: 15 }}
                 >
-                  {ongDetails?.ongPersonalData?.description || "Não informado"}
+                  {ongData?.ongPersonalData?.description || "Não informado"}
                 </Typography>
 
                 <Divider />
@@ -256,16 +226,17 @@ const OngDetails = () => {
                       isValid ? setValidComment(true) : setValidComment(false);
                     }}
                     value={comment}
-                    editable={!loadingComment}
+                    editable={!loading}
                   />
                   <Button
                     title="Enviar"
-                    txtColor="white"
-                    bgColor={!validComment ? "gray" : "primary"}
+                    txtColor={!validComment || loading ? "gray" : "white"}
+                    bgColor={!validComment || loading ? "gray" : "primary"}
+                    outline={!validComment || loading}
                     size="medium"
                     weight="regular"
                     style={{ width: "18%" }}
-                    disabled={!validComment && loadingComment}
+                    disabled={!validComment || loading}
                     onPress={() => handleCreateComment()}
                   />
                 </S.CommentsContainer>
@@ -275,7 +246,7 @@ const OngDetails = () => {
                     Comentários
                   </Typography>
                   <Typography color="gray" size="medium" weight="regular">
-                    ({ongDetails?.comments?.length || 0})
+                    ({ongData?.comments?.length || 0})
                   </Typography>
                 </S.DescriptionContainer>
               </>

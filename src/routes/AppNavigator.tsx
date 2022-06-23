@@ -54,7 +54,6 @@ const AppNavigator = () => {
     if (token) {
       setIsAuth(true);
       if (personalData) {
-        console.log("token: ", token, "personalData: ", personalData);
         setPersonalData(JSON.parse(personalData));
       }
     }

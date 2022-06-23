@@ -15,12 +15,12 @@ import { Container } from "../../styles/global.style";
 
 const History = () => {
   const { personalData } = useAuth();
-  const { data, error, isValidating } = useFetch(
+  const { data, error, loading } = useFetch(
     `/donations/user/${personalData.id}`
   );
   const { reset } = useNavigation();
   const [donations, setDonations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingData, setLoadingData] = useState(true);
 
   if (error) {
     Alert.alert("Erro", "Erro ao carregar histórico de doações", [
@@ -29,13 +29,14 @@ const History = () => {
         onPress: () => reset({ index: 0, routes: [{ name: "Index" }] }),
       },
     ]);
+    return null;
   }
 
   useEffect(() => {
-    setLoading(true);
-    if (!error && !!data) {
+    setLoadingData(true);
+    if (!loading) {
       setDonations(data);
-      setLoading(false);
+      setLoadingData(false);
     }
   }, [data]);
 
@@ -52,7 +53,7 @@ const History = () => {
       />
       <Header back title="Histórico de doações" />
 
-      {loading ? (
+      {loadingData ? (
         [0, 1].map((item) => (
           <Skeleton
             key={item}

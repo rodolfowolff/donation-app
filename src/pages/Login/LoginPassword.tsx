@@ -31,7 +31,6 @@ const LoginPassword = () => {
     console.log("loginErrorCount: ", loginErrorCount);
 
     if (loginErrorCount >= 3) {
-      console.log("loginErrorCount > 3: ", loginErrorCount);
       Alert.alert(
         "Erro login",
         "Você errou mais de 3 tentativas, encerrando aplicado.",
