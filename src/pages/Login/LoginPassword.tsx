@@ -42,6 +42,7 @@ const LoginPassword = () => {
       setTimeout(() => {
         BackHandler.exitApp();
       }, 1500);
+
       return;
     }
 

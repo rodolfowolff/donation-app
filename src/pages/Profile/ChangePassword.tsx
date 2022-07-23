@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  StatusBar,
-  TouchableOpacity,
-} from "react-native";
+import { Alert, Pressable, StatusBar, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

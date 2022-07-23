@@ -4,7 +4,7 @@ import { request } from "../config/request";
 export { useSWRConfig };
 
 export default (url: string | null) => {
-  const { data, error, isValidating } = useSWR(
+  const { data, error } = useSWR(
     url,
     async (url: string) => {
       const response = await request.get(url);
@@ -15,6 +15,6 @@ export default (url: string | null) => {
       revalidateOnFocus: true, //revalidate on focus to component if user moved to another tab or window
     }
   );
-  const loading = isValidating || !data;
-  return { data, error, isValidating, loading };
+  const loading = !error && !data;
+  return { data, error, loading };
 };
